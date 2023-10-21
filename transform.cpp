@@ -41,3 +41,19 @@ std::vector<sf::Vector3f> Transform::transformed(const Matrix<3> &m, const sf::V
 
     return transformed(m4);
 }
+
+void Transform::rotateAround(Line *line, float cosa, float sina) {
+
+}
+
+void Transform::scaleAround(const sf::Vector3f &p, float kx, float ky, float kz) {
+
+}
+
+void Transform::transform(const Matrix<3> &m, const sf::Vector3f &v) {
+
+}
+
+void Transform::transform(const Matrix<4> &m) {
+
+}

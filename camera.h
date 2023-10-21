@@ -9,14 +9,19 @@ enum class Projection {
     Perspective
 };
 
-class Camera: public sf::Drawable, public Transform {
+class Camera: public Transform {
 public:
-    explicit Camera(const sf::Vector3f& position, std::vector<Object*>* objects);
+    explicit Camera(const sf::Vector3f& position, std::vector<Object*>* objects, const sf::Vector2u& screenSize);
     void setProjection(Projection proj);
     void setPixbuf(Pixbuf* buf) { pixbuf = buf; }
 
-protected:
-    void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
+    std::vector<sf::Vector3f> movedBy(const sf::Vector3f &v) const override;
+    std::vector<sf::Vector3f> rotatedAround(Line *line, float cosa, float sina) const override;
+    std::vector<sf::Vector3f> scaledAround(const sf::Vector3f &p, float kx, float ky, float kz) const override;
+    std::vector<sf::Vector3f> transformed(const Matrix<4> &m) const override;
+
+public:
+    void render() const;
 
 private:
     std::vector<sf::Vector3f> projectionTransform(const std::vector<sf::Vector3f>& obj) const;
@@ -27,21 +32,30 @@ private:
 private:
     Projection projection;
     Matrix<4> projectionTransformMatrix;
-    Matrix<4> projectionMatrix;
     mutable Pixbuf* pixbuf;
     std::vector<Object*>* objects;
     sf::Vector3f topRight;
+    sf::Vector3f localPosition;
     float scale;
+    sf::Vector2u screenSize;
+    mutable sf::Texture texture;
+
+    static constexpr float projectionMatrix[16] {
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 0, 1,
+            0, 0, 0, 1
+    };
 
     static constexpr float perspective[16] {0, 0, 0, 0,
                                      0, 0, 0, 0,
                                      0, 0, 0, 0,
                                      0, 0, 0, 0};
 
-    static constexpr float parallel[16] {0, 0, 0, 0,
-                                  0, 0, 0, 0,
-                                  0, 0, 0, 0,
-                                  0, 0, 0, 0};
+    static constexpr float parallel[16] {0.7071, -0.408194688, 0.577375434,  0,
+                                         0,       0.81654,     0.57728,      0,
+                                        -0.7071, -0.408194688, 0.577375434, 0,
+                                        0,      0,           0,           1};
 };
 
 

@@ -79,7 +79,7 @@ public:
     }
 
     Matrix<N> operator*(const Matrix<N>& other) const {
-        Matrix<N> result;
+        Matrix<N> result = Matrix<N>::zero();
         for(int i = 0; i < N; ++i) {
             for(int j = 0; j < N; ++j) {
                 for(int k = 0; k < N; ++k) {
@@ -97,16 +97,16 @@ public:
         result.x = operator()(0, 0) * v.x + operator()(0, 1) * v.y;
         result.y = operator()(1, 0) * v.x + operator()(1, 1) * v.y;
 
-        if constexpr(N == 3) {
+        if constexpr(N >= 3) {
             result.x += operator()(0, 2) * v.z;
-            result.x += operator()(1, 2) * v.z;
+            result.y += operator()(1, 2) * v.z;
             result.z = operator()(2, 0) * v.x + operator()(2, 1) * v.y + operator()(2, 2) * v.z;
         }
 
-        if constexpr(N == 4) {
+        if constexpr(N >= 4) {
             result.x += operator()(0, 3) * v.w;
-            result.x += operator()(1, 3) * v.w;
-            result.z = operator()(2, 3) * v.w;
+            result.y += operator()(1, 3) * v.w;
+            result.z += operator()(2, 3) * v.w;
             result.w = operator()(3, 0) * v.x + operator()(3, 1) * v.y + operator()(3, 2) * v.z + operator()(3, 3) * v.w;
         }
 

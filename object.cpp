@@ -44,7 +44,7 @@ std::vector<sf::Vector3f> Object::transformed(const Matrix<4> &m) const {
     for(int i = 0; i < vertices.size(); ++i) {
         auto v4 = sf::Vector4f(vertices[i].x, vertices[i].y, vertices[i].z, 1);
         auto tmp = m * v4;
-        result[i] = sf::Vector3f(tmp.x, tmp.y, tmp.z);
+        result.emplace_back(tmp.x, tmp.y, tmp.z);
     }
 
     return result;
