@@ -4,18 +4,19 @@
 #include "algorithm.h"
 
 Camera::Camera(const sf::Vector3f &position, std::vector<Object*>* objects, const sf::Vector2u& screenSize)
-    : Transform(position), objects(objects), localPosition(sf::Vector3f(0, 0, -1)), topRight(5, 5, 0), screenSize(screenSize)
+    : Transform(position), objects(objects), localPosition(sf::Vector3f(0, 0, -2)), topRight(5, 5, 0), screenSize(screenSize)
 { }
 
 void Camera::render() const {
     pixbuf->fill(sf::Color::White);
 
-    for(const auto object: *objects) {
-        auto transformed = object->transformed(projectionTransformMatrix);
-        auto viewSpace = Object({}, transformed, {}).transformed(object->objectToWorldMatrix() * worldToObjectMatrix());
-        //auto viewSpace = object->transformed(object->objectToWorldMatrix() * worldToObjectMatrix());
-        //auto transformed = projectionTransform(viewSpace);
-        auto projected = project(viewSpace);
+    for(auto object: *objects) {
+        //auto transformed = object->transformed(projectionTransformMatrix);
+        //auto viewSpace = Object({}, transformed, {}).transformed(object->objectToWorldMatrix() * worldToObjectMatrix());
+        //auto projected = project(viewSpace);
+        auto viewSpace = object->transformed(object->objectToWorldMatrix() * worldToObjectMatrix());
+        auto transformed = projectionTransform(viewSpace);
+        auto projected = project(transformed);
         auto mapped = mapToScreen(projected);
         draw(mapped, object);
     }
@@ -30,7 +31,7 @@ void Camera::draw(const std::vector<sf::Vector2i> &vertices, Object *obj) const 
 void Camera::setProjection(Projection proj) {
     projection = proj;
     if(proj == Projection::Parallel) {
-        auto phi = -45 * M_PI / 180;
+        /*auto phi = -45 * M_PI / 180;
         auto theta = 35.26 * M_PI / 180;
         Matrix<4> yRotate {{
             (float)cos(phi), 0, (float)-sin(phi),0,
@@ -45,9 +46,15 @@ void Camera::setProjection(Projection proj) {
             0, 0,                    0,                    1
         }};
 
-        projectionTransformMatrix = yRotate * xRotate;
+        projectionTransformMatrix = yRotate * xRotate;*/
+        //projectionTransformMatrix = parallel;
+        projectionTransformMatrix = Matrix<4>::identity();
     } else {
-        projectionTransformMatrix = Matrix<4>(perspective);
+        Matrix<4> m = Matrix<4>::identity();
+        sf::Vector4f tmp(localPosition.x, localPosition.y, localPosition.z, 1);
+        auto v4 = tmp * objectToWorldMatrix();
+        m(2, 3) = -1 / (v4.z / v4.w);
+        projectionTransformMatrix = m;
     }
 }
 
@@ -91,4 +98,12 @@ std::vector<sf::Vector2f> Camera::project(const std::vector<sf::Vector3f> &verti
     }
 
     return result;
+}
+
+std::vector<sf::Vector3f> Camera::rotatedAroundX(float angle) {
+    return std::vector<sf::Vector3f>();
+}
+
+std::vector<sf::Vector3f> Camera::rotatedAroundY(float angle) {
+    return std::vector<sf::Vector3f>();
 }

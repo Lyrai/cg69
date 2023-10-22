@@ -18,6 +18,11 @@ public:
     std::vector<sf::Vector3f> movedBy(const sf::Vector3f &v) const override;
     std::vector<sf::Vector3f> rotatedAround(Line *line, float cosa, float sina) const override;
     std::vector<sf::Vector3f> scaledAround(const sf::Vector3f &p, float kx, float ky, float kz) const override;
+
+    std::vector<sf::Vector3f> rotatedAroundX(float angle) override;
+
+    std::vector<sf::Vector3f> rotatedAroundY(float angle) override;
+
     std::vector<sf::Vector3f> transformed(const Matrix<4> &m) const override;
 
 public:
@@ -43,7 +48,7 @@ private:
     static constexpr float projectionMatrix[16] {
             1, 0, 0, 0,
             0, 1, 0, 0,
-            0, 0, 0, 1,
+            0, 0, 0, 0,
             0, 0, 0, 1
     };
 

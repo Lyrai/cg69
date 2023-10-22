@@ -16,14 +16,14 @@ int main() {
     Pixbuf pixbuf(window_size);
     std::vector<Object*> objects;
     std::vector<sf::Vector3f> cubeVertices {
-            {0, 0, 0},
-            {1, 0, 0},
-            {1, 1, 0},
-            {0, 1, 0},
-            {0, 0, 1},
-            {1, 0, 1},
-            {1, 1, 1},
-            {0, 1, 1},
+            {-0.5, -0.5, -0.5},
+            {0.5, -0.5, -0.5},
+            {0.5, 0.5, -0.5},
+            {-0.5, 0.5, -0.5},
+            {-0.5, -0.5, 0.5},
+            {0.5, -0.5, 0.5},
+            {0.5, 0.5, 0.5},
+            {-0.5, 0.5, 0.5},
     };
     std::vector<std::pair<int, int>> cubeEdges {
             {0, 1},
@@ -39,13 +39,13 @@ int main() {
             {6, 7},
             {7, 4}
     };
-    Object cube({1, 1, 1}, cubeVertices, cubeEdges);
+    Object cube({0, 0, 0}, cubeVertices, cubeEdges);
     objects.push_back(&cube);
     Object gizmos({0, 0, 0}, {{0, 0, 0}, {1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {{0, 1}, {0, 2}, {0, 3}});
-    objects.push_back(&gizmos);
+    //objects.push_back(&gizmos);
     Camera cam({-2.5, -2.5, 0}, &objects, window_size);
     cam.setPixbuf(&pixbuf);
-    cam.setProjection(Projection::Parallel);
+    cam.setProjection(Projection::Perspective);
 
     //texture.update(pixbuf.raw());
 
@@ -58,6 +58,22 @@ int main() {
                 case sf::Event::Closed:
                     window.close();
                     break;
+                case sf::Event::KeyPressed:
+                    switch(event.key.code) {
+                        case sf::Keyboard::Key::A:
+                            cam.rotateAroundY(-1);
+                            break;
+                        case sf::Keyboard::Key::D:
+                            cam.rotateAroundY(1);
+                            break;
+                        case sf::Keyboard::Key::W:
+                            cam.rotateAroundX(-1);
+                            break;
+                        case sf::Keyboard::Key::S:
+                            cam.rotateAroundX(1);
+                            break;
+                    }
+                    break;
             }
         }
 
@@ -69,7 +85,6 @@ int main() {
         /*for(auto object: objects) {
             object->moveBy({0.001, 0.001, 0});
         }*/
-
     }
     return 0;
 }
