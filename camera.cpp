@@ -11,14 +11,11 @@ void Camera::render() const {
     pixbuf->fill(sf::Color::White);
 
     for(const auto object: *objects) {
-        auto worldSpace = object->transformed(object->objectToWorldMatrix());
-        auto viewSpace = Object({}, worldSpace, {}).transformed(worldToObjectMatrix());
-        auto transformed = projectionTransform(viewSpace);
-        auto projected = project(transformed);
-        /*std::vector<sf::Vector2f> projected;
-        for(const auto vec: viewSpace) {
-            projected.emplace_back(vec.x, vec.y);
-        }*/
+        auto transformed = object->transformed(projectionTransformMatrix);
+        auto viewSpace = Object({}, transformed, {}).transformed(object->objectToWorldMatrix() * worldToObjectMatrix());
+        //auto viewSpace = object->transformed(object->objectToWorldMatrix() * worldToObjectMatrix());
+        //auto transformed = projectionTransform(viewSpace);
+        auto projected = project(viewSpace);
         auto mapped = mapToScreen(projected);
         draw(mapped, object);
     }
@@ -36,26 +33,19 @@ void Camera::setProjection(Projection proj) {
         auto phi = -45 * M_PI / 180;
         auto theta = 35.26 * M_PI / 180;
         Matrix<4> yRotate {{
-            (float)cos(phi), 0, (float)sin(phi), 0,
+            (float)cos(phi), 0, (float)-sin(phi),0,
             0,                  1, 0,                  0,
-            (float)-sin(phi),0, (float)cos(phi), 0,
+            (float)sin(phi), 0, (float)cos(phi), 0,
             0,                  0, 0,                  1
         }};
         Matrix<4> xRotate {{
             1, 0,                    0,                    0,
-            0, (float)cos(theta), (float)-sin(theta),0,
-            0, (float)sin(phi),   (float)cos(phi),   0,
+            0, (float)cos(theta), (float)sin(theta), 0,
+            0, (float)-sin(theta),(float)cos(theta), 0,
             0, 0,                    0,                    1
         }};
-        Matrix<4> tr {{
-            (float)cos(phi), (float)(sin(theta) * sin(phi)),                    0,                    0,
-            0, (float)cos(theta), 0, 0,
-            (float)sin(phi),   (float)(cos(phi) * -sin(theta)),   0, 0,
-            0, 0,                    0,                    1
-        }};
-        auto mmm = yRotate * xRotate * projectionMatrix;
-        //projectionTransformMatrix = Matrix<4>(tr);
-        projectionTransformMatrix = Matrix<4>(parallel);
+
+        projectionTransformMatrix = yRotate * xRotate;
     } else {
         projectionTransformMatrix = Matrix<4>(perspective);
     }

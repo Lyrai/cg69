@@ -14,16 +14,11 @@ Object::Object(const sf::Vector3f& position, const std::vector<sf::Vector3f> &ve
 { }
 
 std::vector<sf::Vector3f> Object::movedBy(const sf::Vector3f &v) const {
-    static constexpr float values[9] {1, 0, 0,
-                                      0, 1, 0,
-                                      0, 0, 1};
-    static constexpr Matrix<3> matrix(values);
-
     std::vector<sf::Vector3f> result;
     result.reserve(vertices.size());
 
     for (const auto &point: vertices) {
-        result.push_back(matrix * point + v);
+        result.push_back(point + v);
     }
 
     return result;
@@ -42,9 +37,9 @@ std::vector<sf::Vector3f> Object::transformed(const Matrix<4> &m) const {
     result.reserve(vertices.size());
 
     for(int i = 0; i < vertices.size(); ++i) {
-        auto v4 = sf::Vector4f(vertices[i].x, vertices[i].y, vertices[i].z, 1);
-        auto tmp = m * v4;
-        result.emplace_back(tmp.x, tmp.y, tmp.z);
+        auto tmp = sf::Vector4f(vertices[i].x, vertices[i].y, vertices[i].z, 1);
+        auto v4 = tmp * m;
+        result.emplace_back(v4.x, v4.y, v4.z);
     }
 
     return result;

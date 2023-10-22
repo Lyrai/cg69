@@ -1,5 +1,6 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include <cmath>
 #include "camera.h"
 
 sf::Color background_color;
@@ -38,15 +39,11 @@ int main() {
             {6, 7},
             {7, 4}
     };
-    Object cube({0, 0, 1}, cubeVertices, cubeEdges);
-    //objects.push_back(&cube);
-    Object xAxis({2, 2, 2}, {{0, 0, 0}, {1, 0, 0}}, {{0, 1}});
-    Object yAxis({2, 2, 2}, {{0, 0, 0}, {0, -1, 0}}, {{0, 1}});
-    Object zAxis({2, 2, 2}, {{0, 0, 0}, {0, 0, 1}}, {{0, 1}});
-    objects.push_back(&xAxis);
-    objects.push_back(&yAxis);
-    objects.push_back(&zAxis);
-    Camera cam({0, 0, 0}, &objects, window_size);
+    Object cube({1, 1, 1}, cubeVertices, cubeEdges);
+    objects.push_back(&cube);
+    Object gizmos({0, 0, 0}, {{0, 0, 0}, {1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {{0, 1}, {0, 2}, {0, 3}});
+    objects.push_back(&gizmos);
+    Camera cam({-2.5, -2.5, 0}, &objects, window_size);
     cam.setPixbuf(&pixbuf);
     cam.setProjection(Projection::Parallel);
 
@@ -69,9 +66,9 @@ int main() {
         texture.update(pixbuf.raw());
         window.draw(sf::Sprite(texture));
         window.display();
-        for(auto object: objects) {
+        /*for(auto object: objects) {
             object->moveBy({0.001, 0.001, 0});
-        }
+        }*/
 
     }
     return 0;

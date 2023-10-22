@@ -10,3 +10,28 @@ sf::Vector4f sf::Vector4f::operator+(const sf::Vector4f &other) {
 sf::Vector4f sf::Vector4f::operator-(const sf::Vector4f &other) {
     return sf::Vector4f(x + other.x, y + other.y, z + other.z, w + other.w);
 }
+
+sf::Vector4f sf::Vector4f::operator*(const Matrix<4> &m) {
+    sf::Vector4f result(0, 0, 0, 0);
+    result.x += x * m(0, 0);
+    result.x += y * m(1, 0);
+    result.x += z * m(2, 0);
+    result.x += w * m(3, 0);
+
+    result.y += x * m(0, 1);
+    result.y += y * m(1, 1);
+    result.y += z * m(2, 1);
+    result.y += w * m(3, 1);
+
+    result.z += x * m(0, 2);
+    result.z += y * m(1, 2);
+    result.z += z * m(2, 2);
+    result.z += w * m(3, 2);
+
+    result.w += x * m(0, 3);
+    result.w += y * m(1, 3);
+    result.w += z * m(2, 3);
+    result.w += w * m(3, 3);
+
+    return result;
+}

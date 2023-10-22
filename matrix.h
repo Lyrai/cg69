@@ -5,6 +5,9 @@
 #include <cstring>
 #include <SFML/Graphics.hpp>
 
+template<int N>
+class Matrix;
+
 namespace sf {
     class Vector4f {
     public:
@@ -19,6 +22,7 @@ namespace sf {
 
         sf::Vector4f operator+(const sf::Vector4f& other);
         sf::Vector4f operator-(const sf::Vector4f& other);
+        sf::Vector4f operator*(const Matrix<4>& m);
     };
 }
 

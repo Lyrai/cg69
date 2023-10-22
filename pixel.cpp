@@ -9,6 +9,10 @@ Pixel &Pixel::operator=(const std::array<sf::Uint8, 3>& arr) {
 }
 
 Pixel &Pixel::operator=(const sf::Color &color) {
+    if(buffer == nullptr) {
+        return *this;
+    }
+
     buffer[0] = color.r;
     buffer[1] = color.g;
     buffer[2] = color.b;

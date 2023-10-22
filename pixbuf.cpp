@@ -2,6 +2,10 @@
 #include "pixbuf.h"
 
 Pixel Pixbuf::operator[](const sf::Vector2i &pos) {
+    if(pos.x > size.x || pos.x < 0 || pos.y > size.y || pos.y < 0) {
+        return Pixel(nullptr);
+    }
+
     return Pixel(buffer + (pos.y * 4 * size.x + pos.x * 4));
 }
 
@@ -23,6 +27,10 @@ void Pixbuf::fill(const sf::Color &color) {
 }
 
 Pixel Pixbuf::at(int x, int y) {
+    if(x > size.x || x < 0 || y > size.y || y < 0) {
+        return Pixel(nullptr);
+    }
+
     return Pixel(buffer + (y * 4 * size.x + x * 4));
 }
 
