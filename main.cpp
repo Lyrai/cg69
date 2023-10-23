@@ -81,6 +81,24 @@ int main() {
                         case sf::Keyboard::Key::Q:
                             cam.scaleAround(vm, 0.9, 0.9, 0.9);
                             break;
+                        case sf::Keyboard::Key::Up:
+                            cam.moveBy(sf::Vector3f(0, 0.1, 0));
+                            break;
+                        case sf::Keyboard::Key::Down:
+                            cam.moveBy(sf::Vector3f(0, -0.1, 0));
+                            break;
+                        case sf::Keyboard::Key::Left:
+                            cam.moveBy(sf::Vector3f(0.1, 0, 0));
+                            break;
+                        case sf::Keyboard::Key::Right:
+                            cam.moveBy(sf::Vector3f(-0.1, 0, 0));
+                            break;
+                        case sf::Keyboard::Key::K:
+                            cam.moveBy(sf::Vector3f(0, 0, -0.1));
+                            break;
+                        case sf::Keyboard::Key::L:
+                            cam.moveBy(sf::Vector3f(0, 0, 0.1));
+                            break;
                     }
                     break;
             }
