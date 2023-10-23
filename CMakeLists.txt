@@ -13,5 +13,7 @@ add_executable(cg6 main.cpp pixbuf.cpp pixel.cpp polygon.cpp line.cpp
         transform.h
         matrix.cpp
         algorithm.cpp
-        algorithm.h)
+        algorithm.h
+        figures.h
+        figures.cpp)
 target_link_libraries(cg6 sfml-graphics sfml-window sfml-system)

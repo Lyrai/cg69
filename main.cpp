@@ -2,8 +2,10 @@
 #include <SFML/Graphics.hpp>
 #include <cmath>
 #include "camera.h"
+#include "figures.h"
 
 sf::Color background_color;
+
 
 int main() {
     background_color = sf::Color::White;
@@ -15,39 +17,16 @@ int main() {
 
     Pixbuf pixbuf(window_size);
     std::vector<Object *> objects;
-    std::vector<sf::Vector3f> cubeVertices{
-            {-0.5, -0.5, -0.5},
-            {0.5,  -0.5, -0.5},
-            {0.5,  0.5,  -0.5},
-            {-0.5, 0.5,  -0.5},
-            {-0.5, -0.5, 0.5},
-            {0.5,  -0.5, 0.5},
-            {0.5,  0.5,  0.5},
-            {-0.5, 0.5,  0.5},
-    };
-    std::vector<std::pair<int, int>> cubeEdges{
-            {0, 1},
-            {1, 2},
-            {2, 3},
-            {3, 0},
-            {0, 4},
-            {1, 5},
-            {2, 6},
-            {3, 7},
-            {4, 5},
-            {5, 6},
-            {6, 7},
-            {7, 4}
-    };
-    Object cube({0, 0, 0}, cubeVertices, cubeEdges);
+
+    Object cube = createIcosahedron();
     objects.push_back(&cube);
     cube.rotateAroundY(45);
     cube.moveBy({1, 0, 2});
     Object gizmos({0, 0, 0}, {{0, 0, 0}, {1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {{0, 1}, {0, 2}, {0, 3}});
     //objects.push_back(&gizmos);
-    Camera cam({0, 0, 0}, &objects, window_size);
+    Camera cam({0, 0, 5}, &objects, window_size);
     cam.setPixbuf(&pixbuf);
-    cam.setProjection(Projection::Perspective);
+    cam.setProjection(Projection::Parallel);
 
     //texture.update(pixbuf.raw());
     sf::Vector3f vm(3, 3, 3);
@@ -106,7 +85,7 @@ int main() {
         texture.update(pixbuf.raw());
         window.draw(sf::Sprite(texture));
         window.display();
-        cube.moveBy({0, 0, -0.001});
+        //cube.moveBy({0, 0, -0.001});
 
     }
     return 0;
