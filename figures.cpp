@@ -140,6 +140,71 @@ Object createIcosahedron()
     return icosahedron;
 }
 
+Object createShelestStar()
+{
+    float coef = sqrt(1+1.6180*1.6180);
+    float phi = 1.6180*coef;
+    std::vector<sf::Vector3f> dodecahedronVertices{
+            {1.f/coef,1.f/coef,1.f/coef},//0
+            {1.f/coef,1.f/coef,-1.f/coef},//1
+            {1.f/coef,-1.f/coef,1.f/coef},//2
+            {1.f/coef,-1.f/coef,-1.f/coef},//3
+            {-1.f/coef,1.f/coef,1.f/coef},//4
+            {-1.f/coef,1.f/coef,-1.f/coef},//5
+            {-1.f/coef,-1.f/coef,1.f/coef},//6
+            {-1.f/coef,-1.f/coef,-1.f/coef},//7
+            {0,1/phi,phi},//8
+            {0,1/phi,-phi},//9
+            {0,-1/phi,phi},//10
+            {0,-1/phi,-phi},//11
+            {1/phi,phi,0},//12
+            {1/phi,-phi,0},//13
+            {-1/phi,phi,0},//14
+            {-1/phi,-phi,0},//15
+            {phi,0,1/phi},//16
+            {phi,0,-1/phi},//17
+            {-phi,0,1/phi},//18
+            {-phi,0,-1/phi}//19
+    };
+
+    std::vector<std::pair<int, int>> dodecahedronEdges{
+            {8,10},
+            {8,0},
+            {8,4},
+            {10,2},
+            {10,6},
+            {9,11},
+            {9,1},
+            {9,5},
+            {11,3},
+            {11,7},
+            //------------------
+            {12,14},
+            {13,15},
+            {12,0},
+            {12,1},
+            {14,4},
+            {14,5},
+            {13,2},
+            {13,3},
+            {15,6},
+            {15,7},
+            //---------------------------
+            {16,17},
+            {18,19},
+            {16,0},
+            {16,2},
+            {17,1},
+            {17,3},
+            {18,4},
+            {18,6},
+            {19,5},
+            {19,7}
+    };
+    Object dodecahedron({0, 0, 0}, dodecahedronVertices, dodecahedronEdges);
+    return dodecahedron;
+}
+
 Object createDodecahedron()
 {
     float phi = 1.6180;

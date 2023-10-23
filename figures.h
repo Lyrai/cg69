@@ -9,4 +9,5 @@ Object createOctahedron();
 Object createTetrahedron();
 Object createIcosahedron();
 Object createDodecahedron();
+Object createShelestStar();
 #endif //CG6_FIGURES_H
