@@ -49,7 +49,7 @@ void Transform::rotateAround(Line *line, float cosa, float sina) {
 
 void Transform::scaleAround(const sf::Vector3f &p, float kx, float ky, float kz) {
     sf::Vector4f tmp(p.x, p.y, p.z, 1);
-    sf::Vector3f v((1 - kx) * p.x, (1 - ky) * p.y, (1 - kz) * p.z);
+    sf::Vector3f v(kx, ky, kz);
     Matrix<4> m = Matrix<4>::identity();
     m(0, 0) = v.x;
     m(1, 1) = v.y;
@@ -57,11 +57,12 @@ void Transform::scaleAround(const sf::Vector3f &p, float kx, float ky, float kz)
     auto v4 = tmp * m;
 
     position = sf::Vector3f(v4.x / v4.w, v4.y / v4.w, v4.z / v4.w);
-
-//    float values[9]{kx, 0, 0,
-//                    0, ky, 0,
-//                    0, 0, kz};
     objectToWorld = objectToWorld * m;
+    m(0, 0) = 1 / kx;
+    m(1, 1) = 1 / ky;
+    m(2, 2) = 1 / kz;
+
+
     worldToObject = m * worldToObject;
 
 }

@@ -29,7 +29,7 @@ int main() {
     cam.setProjection(Projection::Parallel);
 
     //texture.update(pixbuf.raw());
-    sf::Vector3f vm(3, 3, 3);
+    sf::Vector3f vm(0, 0, 0);
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -52,10 +52,10 @@ int main() {
                             cam.rotateAroundX(1);
                             break;
                         case sf::Keyboard::Key::E:
-                            cam.scaleAround(vm, 0.1, 0.1, 0.1);
+                            cam.scaleAround(vm, 0.9, 0.9, 0.9);
                             break;
                         case sf::Keyboard::Key::Q:
-                            cam.scaleAround(vm, 0.9, 0.9, 0.9);
+                            cam.scaleAround(vm, 1.1, 1.1, 1.1);
                             break;
                         case sf::Keyboard::Key::Up:
                             cam.moveBy(sf::Vector3f(0, 0.1, 0));
