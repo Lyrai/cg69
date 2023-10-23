@@ -35,3 +35,7 @@ sf::Vector4f sf::Vector4f::operator*(const Matrix<4> &m) {
 
     return result;
 }
+
+float dot(const sf::Vector3f& a, const sf::Vector3f& b) {
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}

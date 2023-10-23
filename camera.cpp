@@ -15,7 +15,8 @@ void Camera::render() const {
         //auto viewSpace = Object({}, transformed, {}).transformed(object->objectToWorldMatrix() * worldToObjectMatrix());
         //auto projected = project(viewSpace);
         auto viewSpace = object->transformed(object->objectToWorldMatrix() * worldToObjectMatrix());
-        auto transformed = projectionTransform(viewSpace);
+        auto clipped = clip(viewSpace, object);
+        auto transformed = projectionTransform(clipped->vertices());
         auto projected = project(transformed);
         auto mapped = mapToScreen(projected);
         draw(mapped, object);
@@ -107,4 +108,40 @@ std::vector<sf::Vector3f> Camera::rotatedAroundX(float angle) {
 
 std::vector<sf::Vector3f> Camera::rotatedAroundY(float angle) {
     return std::vector<sf::Vector3f>();
+}
+
+Object *Camera::clip(const std::vector<sf::Vector3f> &transformedVertices, Object *obj) const {
+    std::vector<std::pair<int, int>> edges;
+    std::vector<sf::Vector3f> vertices = transformedVertices;
+    bool clipped = false;
+    for(const auto& edge: obj->edges()) {
+        if(vertices[edge.first].z >= 0 && vertices[edge.second].z >= 0) {
+            edges.push_back(edge);
+            continue;
+        }
+
+        if(vertices[edge.first].z < 0 && vertices[edge.second].z < 0) {
+            continue;
+        }
+
+        clipped = true;
+
+        auto ca = vertices[edge.first] - sf::Vector3f(0, 0, 0);
+        auto vcn = dot(ca, sf::Vector3f(0, 0, 1));
+        auto cv = vertices[edge.second] - vertices[edge.first];
+        auto vcm = dot(cv, sf::Vector3f(0, 0, 1));
+        auto k = vcn / vcm;
+        auto x = sf::Vector3f(cv.x * k, cv.y * k, cv.z * k);
+        vertices.push_back(x);
+        auto newEdge = edge;
+        if(vertices[edge.first].z < 0) {
+            newEdge.first = vertices.size();
+        } else if(vertices[edge.second].z < 0) {
+            newEdge.second = vertices.size();
+        }
+
+        edges.push_back(newEdge);
+    }
+
+    return new Object({0, 0, 0}, vertices, edges);
 }

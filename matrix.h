@@ -129,4 +129,6 @@ private:
     float values[N * N];
 };
 
+float dot(const sf::Vector3f& a, const sf::Vector3f& b);
+
 #endif //CG6_MATRIX_H
