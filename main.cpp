@@ -14,18 +14,18 @@ int main() {
     texture.create(window_size.x, window_size.y);
 
     Pixbuf pixbuf(window_size);
-    std::vector<Object*> objects;
-    std::vector<sf::Vector3f> cubeVertices {
+    std::vector<Object *> objects;
+    std::vector<sf::Vector3f> cubeVertices{
             {-0.5, -0.5, -0.5},
-            {0.5, -0.5, -0.5},
-            {0.5, 0.5, -0.5},
-            {-0.5, 0.5, -0.5},
+            {0.5,  -0.5, -0.5},
+            {0.5,  0.5,  -0.5},
+            {-0.5, 0.5,  -0.5},
             {-0.5, -0.5, 0.5},
-            {0.5, -0.5, 0.5},
-            {0.5, 0.5, 0.5},
-            {-0.5, 0.5, 0.5},
+            {0.5,  -0.5, 0.5},
+            {0.5,  0.5,  0.5},
+            {-0.5, 0.5,  0.5},
     };
-    std::vector<std::pair<int, int>> cubeEdges {
+    std::vector<std::pair<int, int>> cubeEdges{
             {0, 1},
             {1, 2},
             {2, 3},
@@ -50,18 +50,16 @@ int main() {
     cam.setProjection(Projection::Perspective);
 
     //texture.update(pixbuf.raw());
-
-    while (window.isOpen())
-    {
+    sf::Vector3f vm(3, 3, 3);
+    while (window.isOpen()) {
         sf::Event event;
-        while (window.pollEvent(event))
-        {
+        while (window.pollEvent(event)) {
             switch (event.type) {
                 case sf::Event::Closed:
                     window.close();
                     break;
                 case sf::Event::KeyPressed:
-                    switch(event.key.code) {
+                    switch (event.key.code) {
                         case sf::Keyboard::Key::A:
                             cam.rotateAroundY(-1);
                             break;
@@ -73,6 +71,30 @@ int main() {
                             break;
                         case sf::Keyboard::Key::S:
                             cam.rotateAroundX(1);
+                            break;
+                        case sf::Keyboard::Key::E:
+                            cam.scaleAround(vm, 0.1, 0.1, 0.1);
+                            break;
+                        case sf::Keyboard::Key::Q:
+                            cam.scaleAround(vm, 0.9, 0.9, 0.9);
+                            break;
+                        case sf::Keyboard::Key::Up:
+                            cam.moveBy(sf::Vector3f(0, 0.1, 0));
+                            break;
+                        case sf::Keyboard::Key::Down:
+                            cam.moveBy(sf::Vector3f(0, -0.1, 0));
+                            break;
+                        case sf::Keyboard::Key::Left:
+                            cam.moveBy(sf::Vector3f(0.1, 0, 0));
+                            break;
+                        case sf::Keyboard::Key::Right:
+                            cam.moveBy(sf::Vector3f(-0.1, 0, 0));
+                            break;
+                        case sf::Keyboard::Key::K:
+                            cam.moveBy(sf::Vector3f(0, 0, -0.1));
+                            break;
+                        case sf::Keyboard::Key::L:
+                            cam.moveBy(sf::Vector3f(0, 0, 0.1));
                             break;
                     }
                     break;

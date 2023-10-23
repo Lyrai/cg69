@@ -10,8 +10,7 @@ Matrix<4> Transform::worldToObjectMatrix() const {
 }
 
 Transform::Transform(const sf::Vector3f &position)
-    : position({0, 0, 0}), objectToWorld(Matrix<4>::identity()), worldToObject(Matrix<4>::identity())
-{
+        : position({0, 0, 0}), objectToWorld(Matrix<4>::identity()), worldToObject(Matrix<4>::identity()) {
     Transform::moveBy(position);
 }
 
@@ -32,13 +31,14 @@ void Transform::moveBy(const sf::Vector3f &v) {
     worldToObject = m * worldToObject;
 }
 
+
 std::vector<sf::Vector3f> Transform::transformed(const Matrix<3> &m, const sf::Vector3f &v) const {
-    Matrix<4> m4 ({
-        m(0, 0), m(0, 1), m(0, 2), 0,
-        m(1, 0), m(1, 1), m(1, 2), 0,
-        m(2, 0), m(2, 1), m(2, 2), 0,
-        v.x, v.y, v.z, 1
-    });
+    Matrix<4> m4({
+                         m(0, 0), m(0, 1), m(0, 2), 0,
+                         m(1, 0), m(1, 1), m(1, 2), 0,
+                         m(2, 0), m(2, 1), m(2, 2), 0,
+                         v.x, v.y, v.z, 1
+                 });
 
     return transformed(m4);
 }
@@ -48,16 +48,31 @@ void Transform::rotateAround(Line *line, float cosa, float sina) {
 }
 
 void Transform::scaleAround(const sf::Vector3f &p, float kx, float ky, float kz) {
+    sf::Vector4f tmp(p.x, p.y, p.z, 1);
+    sf::Vector3f v((1 - kx) * p.x, (1 - ky) * p.y, (1 - kz) * p.z);
+    Matrix<4> m = Matrix<4>::identity();
+    m(0, 0) = v.x;
+    m(1, 1) = v.y;
+    m(2, 2) = v.z;
+    auto v4 = tmp * m;
+
+    position = sf::Vector3f(v4.x / v4.w, v4.y / v4.w, v4.z / v4.w);
+
+//    float values[9]{kx, 0, 0,
+//                    0, ky, 0,
+//                    0, 0, kz};
+    objectToWorld = objectToWorld * m;
+    worldToObject = m * worldToObject;
 
 }
 
 void Transform::transform(const Matrix<3> &m, const sf::Vector3f &v) {
-    Matrix<4> m4 ({
-        m(0, 0), m(0, 1), m(0, 2), 0,
-        m(1, 0), m(1, 1), m(1, 2), 0,
-        m(2, 0), m(2, 1), m(2, 2), 0,
-        v.x, v.y, v.z, 1
-    });
+    Matrix<4> m4({
+                         m(0, 0), m(0, 1), m(0, 2), 0,
+                         m(1, 0), m(1, 1), m(1, 2), 0,
+                         m(2, 0), m(2, 1), m(2, 2), 0,
+                         v.x, v.y, v.z, 1
+                 });
 
     transform(m4);
 }
@@ -65,7 +80,9 @@ void Transform::transform(const Matrix<3> &m, const sf::Vector3f &v) {
 void Transform::transform(const Matrix<4> &m) {
     sf::Vector4f tmp(position.x, position.y, position.z, 1);
     auto v4 = tmp * m;
-    position = sf::Vector3f(v4.x / v4.w, v4.y / v4.w, v4.z / v4.w);
+    position = sf::Vector3f(v4.x / v4.w,
+                            v4.y / v4.w,
+                            v4.z / v4.w);
 }
 
 void Transform::rotateAroundX(float angle) {
@@ -82,7 +99,7 @@ void Transform::rotateAroundX(float angle) {
     auto v4 = tmp * m;
     position = sf::Vector3f(v4.x / v4.w, v4.y / v4.w, v4.z / v4.w);
 
-    objectToWorld = objectToWorld *  m;
+    objectToWorld = objectToWorld * m;
 
     m(1, 2) = -sina;
     m(2, 1) = sina;
@@ -103,7 +120,7 @@ void Transform::rotateAroundY(float angle) {
 
     auto v4 = tmp * m;
     position = sf::Vector3f(v4.x / v4.w, v4.y / v4.w, v4.z / v4.w);
-    objectToWorld = objectToWorld *  m;
+    objectToWorld = objectToWorld * m;
 
     m(0, 2) = -sina;
     m(2, 0) = sina;
