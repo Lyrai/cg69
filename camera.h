@@ -40,6 +40,7 @@ private:
     mutable Pixbuf* pixbuf;
     std::vector<Object*>* objects;
     sf::Vector3f topRight;
+    sf::Vector3f bottomLeft;
     sf::Vector3f localPosition;
     float scale;
     sf::Vector2u screenSize;

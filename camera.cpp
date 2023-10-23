@@ -4,7 +4,7 @@
 #include "algorithm.h"
 
 Camera::Camera(const sf::Vector3f &position, std::vector<Object*>* objects, const sf::Vector2u& screenSize)
-    : Transform(position), objects(objects), localPosition(sf::Vector3f(0, 0, -2)), topRight(5, 5, 0), screenSize(screenSize)
+    : Transform(position), objects(objects), localPosition(sf::Vector3f(0, 0, -2)), topRight(2.5, 2.5, 0), bottomLeft(-2.5, -2.5, 0), screenSize(screenSize)
 { }
 
 void Camera::render() const {
@@ -64,10 +64,11 @@ std::vector<sf::Vector3f> Camera::projectionTransform(const std::vector<sf::Vect
 
 std::vector<sf::Vector2i> Camera::mapToScreen(const std::vector<sf::Vector2f> &projected) const {
     std::vector<sf::Vector2i> result;
-    auto kx = screenSize.x / topRight.x;
-    auto ky = screenSize.y / topRight.y;
+    auto viewPlane = topRight - bottomLeft;
+    auto kx = screenSize.x / viewPlane.x;
+    auto ky = screenSize.y / viewPlane.y;
     for(const auto& vec: projected) {
-        result.emplace_back(vec.x * kx, vec.y * ky);
+        result.emplace_back((vec.x + viewPlane.x / 2) * kx, (vec.y + viewPlane.y / 2) * ky);
     }
 
     return result;
