@@ -18,13 +18,14 @@ int main() {
     Pixbuf pixbuf(window_size);
     std::vector<Object *> objects;
 
-    Object cube = createIcosahedron();
+    //Object cube = createIcosahedron();
+    Object cube = createCube();
     objects.push_back(&cube);
     Object gizmos({0, 0, 0}, {{0, 0, 0}, {1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {{0, 1}, {0, 2}, {0, 3}});
     //objects.push_back(&gizmos);
     Camera cam({0, 0, 0}, &objects, window_size);
     cam.setPixbuf(&pixbuf);
-    cam.setProjection(Projection::Parallel);
+    cam.setProjection(Projection::Perspective);
 
     //texture.update(pixbuf.raw());
     sf::Vector3f vm(0, 0, 0);
@@ -38,40 +39,40 @@ int main() {
                 case sf::Event::KeyPressed:
                     switch (event.key.code) {
                         case sf::Keyboard::Key::A:
-                            cam.rotateAroundY(-1);
+                            cube.rotateAroundY(-1);
                             break;
                         case sf::Keyboard::Key::D:
-                            cam.rotateAroundY(1);
+                            cube.rotateAroundY(1);
                             break;
                         case sf::Keyboard::Key::W:
-                            cam.rotateAroundX(-1);
+                            cube.rotateAroundX(-1);
                             break;
                         case sf::Keyboard::Key::S:
-                            cam.rotateAroundX(1);
+                            cube.rotateAroundX(1);
                             break;
                         case sf::Keyboard::Key::E:
-                            cam.scaleAround(vm, 0.9, 0.9, 0.9);
+                            cube.scaleAround(vm, 0.9, 0.9, 0.9);
                             break;
                         case sf::Keyboard::Key::Q:
-                            cam.scaleAround(vm, 1.1, 1.1, 1.1);
+                            cube.scaleAround(vm, 1.1, 1.1, 1.1);
                             break;
                         case sf::Keyboard::Key::Up:
-                            cam.moveBy(sf::Vector3f(0, 0.1, 0));
+                            cube.moveBy(sf::Vector3f(0, 0.1, 0));
                             break;
                         case sf::Keyboard::Key::Down:
-                            cam.moveBy(sf::Vector3f(0, -0.1, 0));
+                            cube.moveBy(sf::Vector3f(0, -0.1, 0));
                             break;
                         case sf::Keyboard::Key::Left:
-                            cam.moveBy(sf::Vector3f(0.1, 0, 0));
+                            cube.moveBy(sf::Vector3f(0.1, 0, 0));
                             break;
                         case sf::Keyboard::Key::Right:
-                            cam.moveBy(sf::Vector3f(-0.1, 0, 0));
+                            cube.moveBy(sf::Vector3f(-0.1, 0, 0));
                             break;
                         case sf::Keyboard::Key::K:
-                            cam.moveBy(sf::Vector3f(0, 0, -0.1));
+                            cube.moveBy(sf::Vector3f(0, 0, -0.1));
                             break;
                         case sf::Keyboard::Key::L:
-                            cam.moveBy(sf::Vector3f(0, 0, 0.1));
+                            cube.moveBy(sf::Vector3f(0, 0, 0.1));
                             break;
                     }
                     break;

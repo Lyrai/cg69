@@ -15,11 +15,20 @@ void Camera::render() const {
         //auto viewSpace = Object({}, transformed, {}).transformed(object->objectToWorldMatrix() * worldToObjectMatrix());
         //auto projected = project(viewSpace);
         auto viewSpace = object->transformed(object->objectToWorldMatrix() * worldToObjectMatrix());
-        auto clipped = clip(viewSpace, object);
-        auto transformed = projectionTransform(clipped->vertices());
+        std::vector<sf::Vector3f> transformed;
+        Object* clipped = nullptr;
+        if(projection == Projection::Perspective) {
+            clipped = clip(viewSpace, object);
+            transformed = projectionTransform(clipped->vertices());
+        } else {
+            transformed = projectionTransform(viewSpace);
+        }
+
         auto projected = project(transformed);
         auto mapped = mapToScreen(projected);
-        draw(mapped, clipped);
+        draw(mapped, projection == Projection::Perspective ? clipped : object);
+        delete clipped;
+
     }
 }
 
