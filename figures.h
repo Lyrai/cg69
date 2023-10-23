@@ -8,4 +8,5 @@ Object createCube();
 Object createOctahedron();
 Object createTetrahedron();
 Object createIcosahedron();
+Object createDodecahedron();
 #endif //CG6_FIGURES_H
