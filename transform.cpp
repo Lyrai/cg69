@@ -187,6 +187,24 @@ void Transform::rotateAroundLine(float angle, Axis axis) {
     moveBy(tmp);
 }
 
+void Transform::mirrorAroundAxis(Axis axis) {
+//    auto tmp = position;
+//    moveBy(-tmp);
+    switch (axis) {
+        case Axis::X:
+            scaleAround({0, position.y, position.z}, -1, 1, 1);
+            break;
+        case Axis::Y:
+            scaleAround({position.x, 0, position.z}, 1, -1, 1);
+            break;
+        case Axis::Z:
+            scaleAround({position.x, position.y, 0}, 1, 1, -1);
+            break;
+    }
+//    moveBy(tmp);
+}
+
+
 void Transform::rotateAround(Line *line, float angle) {
 
     auto tmp = line->getPoints()[0];

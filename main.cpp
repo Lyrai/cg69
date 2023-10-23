@@ -21,16 +21,16 @@ int main() {
     Object cube = createTetrahedron();
 //    Object cube = createCube();
     objects.push_back(&cube);
-    Object gizmos({0, 0, 0}, {{0, 0,  0},
-                              {1, 0,  0},
+    Object gizmos({0, 0, 0}, {{0, 0, 0},
+                              {1, 0, 0},
                               {0, 1, 0},
-                              {0, 0,  1}}, {{0, 1},
-                                            {0, 2},
-                                            {0, 3}});
+                              {0, 0, 1}}, {{0, 1},
+                                           {0, 2},
+                                           {0, 3}});
     objects.push_back(&gizmos);
     Camera cam({0, 0, 0}, &objects, window_size);
     cam.setPixbuf(&pixbuf);
-    cam.setProjection(Projection::Parallel);
+    cam.setProjection(Projection::Perspective);
 
     //texture.update(pixbuf.raw());
     sf::Vector3f vm(0, 0, 0);
@@ -46,10 +46,10 @@ int main() {
                 case sf::Event::KeyPressed:
                     switch (event.key.code) {
                         case sf::Keyboard::Key::A:
-                            cube.rotateAroundY(-1);
+                            cam.rotateAroundY(-1);
                             break;
                         case sf::Keyboard::Key::D:
-                            cube.rotateAroundY(1);
+                            cam.rotateAroundY(1);
                             break;
                         case sf::Keyboard::Key::W:
                             cube.rotateAroundX(-1);
@@ -74,6 +74,15 @@ int main() {
                             break;
                         case sf::Keyboard::Key::M:
                             cube.rotateAroundLine(1, Axis::Z);
+                            break;
+                        case sf::Keyboard::Key::G:
+                            cube.mirrorAroundAxis(Axis::X);
+                            break;
+                        case sf::Keyboard::Key::H:
+                            cube.mirrorAroundAxis(Axis::Y);
+                            break;
+                        case sf::Keyboard::Key::J:
+                            cube.mirrorAroundAxis(Axis::Z);
                             break;
                         case sf::Keyboard::Key::E:
                             cube.scaleAround(vm, 0.9, 0.9, 0.9);

@@ -28,6 +28,8 @@ public:
 
     virtual void scaleAround(const sf::Vector3f &p, float kx, float ky, float kz);
 
+    virtual void mirrorAroundAxis(Axis axis);
+
     virtual void transform(const Matrix<3> &m, const sf::Vector3f &v);
 
     virtual void transform(const Matrix<4> &m);
