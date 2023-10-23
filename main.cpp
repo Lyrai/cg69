@@ -18,17 +18,24 @@ int main() {
     Pixbuf pixbuf(window_size);
     std::vector<Object *> objects;
 
-    //Object cube = createIcosahedron();
-    Object cube = createCube();
+    Object cube = createTetrahedron();
+//    Object cube = createCube();
     objects.push_back(&cube);
-    Object gizmos({0, 0, 0}, {{0, 0, 0}, {1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {{0, 1}, {0, 2}, {0, 3}});
-    //objects.push_back(&gizmos);
+    Object gizmos({0, 0, 0}, {{0, 0,  0},
+                              {1, 0,  0},
+                              {0, 1, 0},
+                              {0, 0,  1}}, {{0, 1},
+                                            {0, 2},
+                                            {0, 3}});
+    objects.push_back(&gizmos);
     Camera cam({0, 0, 0}, &objects, window_size);
     cam.setPixbuf(&pixbuf);
-    cam.setProjection(Projection::Perspective);
+    cam.setProjection(Projection::Parallel);
 
     //texture.update(pixbuf.raw());
     sf::Vector3f vm(0, 0, 0);
+    Line l({0, 0, 0}, {2, 2, 2});
+
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -49,6 +56,24 @@ int main() {
                             break;
                         case sf::Keyboard::Key::S:
                             cube.rotateAroundX(1);
+                            break;
+                        case sf::Keyboard::Key::Z:
+                            cube.rotateAroundZ(-1);
+                            break;
+                        case sf::Keyboard::Key::X:
+                            cube.rotateAroundZ(1);
+                            break;
+                        case sf::Keyboard::Key::C:
+                            cube.rotateAround(&l, 1);
+                            break;
+                        case sf::Keyboard::Key::B:
+                            cube.rotateAroundLine(1, Axis::X);
+                            break;
+                        case sf::Keyboard::Key::N:
+                            cube.rotateAroundLine(1, Axis::Y);
+                            break;
+                        case sf::Keyboard::Key::M:
+                            cube.rotateAroundLine(1, Axis::Z);
                             break;
                         case sf::Keyboard::Key::E:
                             cube.scaleAround(vm, 0.9, 0.9, 0.9);

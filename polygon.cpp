@@ -84,3 +84,7 @@ std::vector<sf::Vector3f> Polygon::rotatedAround(Line *line, float cosa, float s
 std::vector<sf::Vector3f> Polygon::scaledAround(const sf::Vector3f &p, float kx, float ky, float kz) const {
     return std::vector<sf::Vector3f>();
 }
+
+const std::vector<sf::Vector3f> &Polygon::getPoints() const {
+    return points;
+}

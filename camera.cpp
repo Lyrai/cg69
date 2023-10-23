@@ -120,7 +120,7 @@ std::vector<sf::Vector3f> Camera::rotatedAroundY(float angle) {
 Object *Camera::clip(const std::vector<sf::Vector3f> &transformedVertices, Object *obj) const {
     std::vector<std::pair<int, int>> edges;
     std::vector<sf::Vector3f> vertices = transformedVertices;
-    auto clippingPlane = 0.f;
+    auto clippingPlane = -2.f;
     for(const auto& edge: obj->edges()) {
         auto first = vertices[edge.first];
         auto second = vertices[edge.second];

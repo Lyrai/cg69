@@ -16,6 +16,8 @@ public:
     Polygon(const std::vector<sf::Vector3f>& points);
     void addPoint(const sf::Vector3f& point);
 
+    const std::vector<sf::Vector3f> &getPoints() const;
+
     void moveBy(const sf::Vector3f& v);
     std::vector<sf::Vector3f> movedBy(const sf::Vector3f& v) const;
     void rotateAround(Line* line, float cosa, float sina);
