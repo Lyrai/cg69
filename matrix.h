@@ -130,5 +130,6 @@ private:
 };
 
 float dot(const sf::Vector3f& a, const sf::Vector3f& b);
+sf::Vector3f normalize(const sf::Vector3f& vec);
 
 #endif //CG6_MATRIX_H

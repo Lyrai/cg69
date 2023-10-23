@@ -41,11 +41,13 @@ int main() {
     };
     Object cube({0, 0, 0}, cubeVertices, cubeEdges);
     objects.push_back(&cube);
+    cube.rotateAroundY(45);
+    cube.moveBy({1, 0, 2});
     Object gizmos({0, 0, 0}, {{0, 0, 0}, {1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {{0, 1}, {0, 2}, {0, 3}});
     //objects.push_back(&gizmos);
     Camera cam({0, 0, 0}, &objects, window_size);
     cam.setPixbuf(&pixbuf);
-    cam.setProjection(Projection::Parallel);
+    cam.setProjection(Projection::Perspective);
 
     //texture.update(pixbuf.raw());
 
@@ -82,9 +84,8 @@ int main() {
         texture.update(pixbuf.raw());
         window.draw(sf::Sprite(texture));
         window.display();
-        /*for(auto object: objects) {
-            object->moveBy({0.001, 0.001, 0});
-        }*/
+        cube.moveBy({0, 0, -0.001});
+
     }
     return 0;
 }

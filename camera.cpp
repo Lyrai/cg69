@@ -19,7 +19,7 @@ void Camera::render() const {
         auto transformed = projectionTransform(clipped->vertices());
         auto projected = project(transformed);
         auto mapped = mapToScreen(projected);
-        draw(mapped, object);
+        draw(mapped, clipped);
     }
 }
 
@@ -113,32 +113,45 @@ std::vector<sf::Vector3f> Camera::rotatedAroundY(float angle) {
 Object *Camera::clip(const std::vector<sf::Vector3f> &transformedVertices, Object *obj) const {
     std::vector<std::pair<int, int>> edges;
     std::vector<sf::Vector3f> vertices = transformedVertices;
-    bool clipped = false;
+    auto clippingPlane = 1.f;
     for(const auto& edge: obj->edges()) {
-        if(vertices[edge.first].z >= 0 && vertices[edge.second].z >= 0) {
+        auto first = vertices[edge.first];
+        auto second = vertices[edge.second];
+        if(first.z >= clippingPlane && second.z >= clippingPlane) {
             edges.push_back(edge);
             continue;
         }
 
-        if(vertices[edge.first].z < 0 && vertices[edge.second].z < 0) {
+        if(first.z < clippingPlane && second.z < clippingPlane) {
             continue;
         }
 
-        clipped = true;
+        if(second.z < first.z) {
+            std::swap(first, second);
+        }
 
-        auto ca = vertices[edge.first] - sf::Vector3f(0, 0, 0);
-        auto vcn = dot(ca, sf::Vector3f(0, 0, 1));
-        auto cv = vertices[edge.second] - vertices[edge.first];
-        auto vcm = dot(cv, sf::Vector3f(0, 0, 1));
+        auto normal = sf::Vector3f(0, 0, 1);
+        auto ca = sf::Vector3f(1, 1, 0) - first;
+        auto vcn = dot(ca, normal);
+        auto cv = second - first;
+        auto vcm = dot(cv, normal);
         auto k = vcn / vcm;
+        if(k < 0) {
+            //k *= -1;
+            //continue;
+        } else if(k > 1) {
+            edges.push_back(edge);
+            continue;
+        }
         auto x = sf::Vector3f(cv.x * k, cv.y * k, cv.z * k);
-        vertices.push_back(x);
+        x += first;
         auto newEdge = edge;
-        if(vertices[edge.first].z < 0) {
+        if(vertices[edge.first].z < clippingPlane) {
             newEdge.first = vertices.size();
-        } else if(vertices[edge.second].z < 0) {
+        } else if(vertices[edge.second].z < clippingPlane) {
             newEdge.second = vertices.size();
         }
+        vertices.push_back(x);
 
         edges.push_back(newEdge);
     }

@@ -1,3 +1,4 @@
+#include <cmath>
 #include "matrix.h"
 
 sf::Vector4f::Vector4f(float x, float y, float z, float w): x(x), y(y), z(z), w(w)
@@ -38,4 +39,9 @@ sf::Vector4f sf::Vector4f::operator*(const Matrix<4> &m) {
 
 float dot(const sf::Vector3f& a, const sf::Vector3f& b) {
     return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+sf::Vector3f normalize(const sf::Vector3f& vec) {
+    auto magnitude = sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+    return sf::Vector3f(vec.x / magnitude, vec.y / magnitude, vec.z / magnitude);
 }
