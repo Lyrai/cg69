@@ -27,7 +27,7 @@ void Pixbuf::fill(const sf::Color &color) {
 }
 
 Pixel Pixbuf::at(int x, int y) {
-    if(x > size.x || x < 0 || y > size.y || y < 0) {
+    if(x >= size.x || x < 0 || y >= size.y || y < 0) {
         return Pixel(nullptr);
     }
 

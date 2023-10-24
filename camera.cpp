@@ -4,16 +4,13 @@
 #include "algorithm.h"
 
 Camera::Camera(const sf::Vector3f &position, std::vector<Object*>* objects, const sf::Vector2u& screenSize)
-    : Transform(position), objects(objects), localPosition(sf::Vector3f(0, 0, -10)), topRight(2.5, 2.5, 0), bottomLeft(-2.5, -2.5, 0), screenSize(screenSize)
+    : Transform(position), objects(objects), localPosition(sf::Vector3f(0, 0, -8)), topRight(2.5, 2.5, 0), bottomLeft(-2.5, -2.5, 0), screenSize(screenSize)
 { }
 
 void Camera::render() const {
     pixbuf->fill(sf::Color::White);
 
     for(auto object: *objects) {
-        //auto transformed = object->transformed(projectionTransformMatrix);
-        //auto viewSpace = Object({}, transformed, {}).transformed(object->objectToWorldMatrix() * worldToObjectMatrix());
-        //auto projected = project(viewSpace);
         auto viewSpace = object->transformed(object->objectToWorldMatrix() * worldToObjectMatrix());
         std::vector<sf::Vector3f> transformed;
         Object* clipped = nullptr;
@@ -120,7 +117,7 @@ std::vector<sf::Vector3f> Camera::rotatedAroundY(float angle) {
 Object *Camera::clip(const std::vector<sf::Vector3f> &transformedVertices, Object *obj) const {
     std::vector<std::pair<int, int>> edges;
     std::vector<sf::Vector3f> vertices = transformedVertices;
-    auto clippingPlane = -2.f;
+    auto clippingPlane = localPosition.z + 3;
     for(const auto& edge: obj->edges()) {
         auto first = vertices[edge.first];
         auto second = vertices[edge.second];
@@ -138,7 +135,7 @@ Object *Camera::clip(const std::vector<sf::Vector3f> &transformedVertices, Objec
         }
 
         auto normal = sf::Vector3f(0, 0, 1);
-        auto ca = sf::Vector3f(1, 1, 0) - first;
+        auto ca = sf::Vector3f(1, 1, clippingPlane) - first;
         auto vcn = dot(ca, normal);
         auto cv = second - first;
         auto vcm = dot(cv, normal);
