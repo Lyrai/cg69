@@ -59,7 +59,7 @@ std::vector<sf::Vector3f> parseVertices(const std::vector<std::vector<std::strin
 
 std::vector<std::pair<int, int>> parseEdges(const std::vector<std::pair<std::string, std::string>> &raw_edges) {
     auto rval = std::vector<std::pair<int, int>>();
-    for (const auto& edge_raw: raw_edges) {
+    for (const auto &edge_raw: raw_edges) {
         std::pair<int, int> edge(std::stoi(edge_raw.first), std::stoi(edge_raw.second));
         rval.emplace_back(edge);
     }
@@ -95,18 +95,6 @@ Object createCube() {
     return cube;
 }
 
-
-Object parseCube() {
-    std::ifstream f("figures/cube.json");
-    json data = json::parse(f);
-    auto st = data.get<ns::raw_data>();
-    std::vector<sf::Vector3f> Vertices = parseVertices(st._vertices);
-    std::vector<std::pair<int, int>> Edges = parseEdges(st._edges);
-    Object cube({0, 0, 0}, Vertices, Edges);
-    return cube;
-}
-
-
 Object createOctahedron() {
     std::vector<sf::Vector3f> octahedronVertices{
             {0.0,  0.0,  -1.0},
@@ -136,17 +124,6 @@ Object createOctahedron() {
     return octahedron;
 }
 
-Object parseOctahedron() {
-    std::ifstream f("figures/octahedron.json");
-    json data = json::parse(f);
-    auto st = data.get<ns::raw_data>();
-    std::vector<sf::Vector3f> Vertices = parseVertices(st._vertices);
-    std::vector<std::pair<int, int>> Edges = parseEdges(st._edges);
-    Object octahedron({0, 0, 0}, Vertices, Edges);
-    return octahedron;
-//    return data.get<ns::raw_data>();
-}
-
 Object createTetrahedron() {
     std::vector<sf::Vector3f> tetrahedronVertices{
             {1.0,  1.0,  1.0},
@@ -167,17 +144,6 @@ Object createTetrahedron() {
     Object tetrahedron({0, 0, 0}, tetrahedronVertices, tetrahedronEdges);
     return tetrahedron;
 }
-
-Object parseTetrahedron() {
-    std::ifstream f("./figures/tetrahedron.json");
-    json data = json::parse(f);
-    auto st = data.get<ns::raw_data>();
-    std::vector<sf::Vector3f> Vertices = parseVertices(st._vertices);
-    std::vector<std::pair<int, int>> Edges = parseEdges(st._edges);
-    Object tetrahedron({0, 0, 0}, Vertices, Edges);
-    return tetrahedron;
-}
-
 
 Object createIcosahedron() {
     float phi = 1.6180;
@@ -230,16 +196,6 @@ Object createIcosahedron() {
             {1,  8}//30
     };
     Object icosahedron({0, 0, 0}, icosahedronVertices, icosahedronEdges);
-    return icosahedron;
-}
-
-Object parseIcosahedron() {
-    std::ifstream f("figures/icosahedron.json");
-    json data = json::parse(f);
-    auto st = data.get<ns::raw_data>();
-    std::vector<sf::Vector3f> Vertices = parseVertices(st._vertices);
-    std::vector<std::pair<int, int>> Edges = parseEdges(st._edges);
-    Object icosahedron({0, 0, 0}, Vertices, Edges);
     return icosahedron;
 }
 
@@ -371,12 +327,12 @@ Object createDodecahedron() {
     return dodecahedron;
 }
 
-Object parseDodecahedron() {
-    std::ifstream f("figures/dodecahedron.json");
+Object parseFigure(const std::string &path) {
+    std::ifstream f(path);
     json data = json::parse(f);
     auto st = data.get<ns::raw_data>();
     std::vector<sf::Vector3f> Vertices = parseVertices(st._vertices);
     std::vector<std::pair<int, int>> Edges = parseEdges(st._edges);
-    Object dodecahedron({0, 0, 0}, Vertices, Edges);
-    return dodecahedron;
+    Object cube({0, 0, 0}, Vertices, Edges);
+    return cube;
 }

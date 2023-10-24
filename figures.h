@@ -10,25 +10,17 @@ using json = nlohmann::json;
 
 Object createCube();
 
-Object parseCube();
-
 Object createOctahedron();
-
-Object parseOctahedron();
 
 Object createTetrahedron();
 
-Object parseTetrahedron();
-
 Object createIcosahedron();
-
-Object parseIcosahedron();
 
 Object createDodecahedron();
 
-Object parseDodecahedron();
-
 Object createShelestStar();
+
+Object parseFigure(const std::string& path);
 
 std::vector<sf::Vector3f> parseVertices(const std::vector<std::vector<std::string>> &raw_vertices);
 
