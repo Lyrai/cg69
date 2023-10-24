@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.26)
 project(cg6)
 
 set(CMAKE_CXX_STANDARD 20)
+find_package(nlohmann_json CONFIG REQUIRED)
 
 add_executable(cg6 main.cpp pixbuf.cpp pixel.cpp polygon.cpp line.cpp
         matrix.h
@@ -16,4 +17,4 @@ add_executable(cg6 main.cpp pixbuf.cpp pixel.cpp polygon.cpp line.cpp
         algorithm.h
         figures.h
         figures.cpp)
-target_link_libraries(cg6 sfml-graphics sfml-window sfml-system)
+target_link_libraries(cg6 sfml-graphics sfml-window sfml-system nlohmann_json::nlohmann_json)

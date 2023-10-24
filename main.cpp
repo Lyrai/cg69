@@ -18,7 +18,8 @@ int main() {
     Pixbuf pixbuf(window_size);
     std::vector<Object *> objects;
 
-    Object cube = createIcosahedron();
+//    Object cube = createIcosahedron();
+    Object cube = parseDodecahedron();
 //    Object cube = createCube();
     objects.push_back(&cube);
     Object gizmos({0, 0, 0}, {{0, 0, 0},
