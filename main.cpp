@@ -11,11 +11,27 @@ sf::Color background_color;
 
 int main() {
     background_color = sf::Color::White;
-    sf::RenderWindow window(sf::VideoMode(600, 600), "SFML works!");
+    sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFML works!");
     tgui::Gui gui(window);
-    auto canvas = tgui::CanvasSFML::create({500, 500});
+    auto canvas = tgui::CanvasSFML::create({"90%", "90%"});
     gui.add(canvas);
-    canvas->setPosition({100, 100});
+    canvas->setPosition({"10%", "10%"});
+    auto layout = tgui::HorizontalLayout::create({"100%", "10%"});
+    layout->insertSpace(1, 0.5);
+    gui.add(layout);
+    auto parallelButton = tgui::Button::create("Parallel");
+    parallelButton->setTextSize(20);
+    //parallelButton->setSize({"15%", "5%"});
+    //parallelButton->setPosition({"0%", "0%"});
+
+    auto perspectiveButton = tgui::Button::create("Perspective");
+    //perspectiveButton->setSize({"15%", "5%"});
+    perspectiveButton->setTextSize(20);
+    //perspectiveButton->setPosition({"20%", "0%"});
+
+
+    layout->add(parallelButton);
+    layout->add(perspectiveButton);
 
     sf::Texture texture;
     //auto window_size = window.getSize();
@@ -39,6 +55,9 @@ int main() {
     cam.setPixbuf(&pixbuf);
     cam.setProjection(Projection::Perspective);
 
+    parallelButton->onClick([&cam]() { cam.setProjection(Projection::Parallel); });
+    perspectiveButton->onClick([&cam]() { cam.setProjection(Projection::Perspective); });
+
     //texture.update(pixbuf.raw());
     sf::Vector3f vm(0, 0, 0);
     Line l({0, 0, 0}, {2, 2, 2});
@@ -52,11 +71,10 @@ int main() {
                     window.close();
                     break;
                 case sf::Event::Resized: {
-                    auto windowSize = window.getSize();
-                    auto canvasSize = sf::Vector2u(windowSize.x - 100, windowSize.y - 100);
-                    pixbuf.resize(canvasSize);
-                    texture.create(canvasSize.x, canvasSize.y);
-                    canvas->setSize({canvasSize.x, canvasSize.y});
+                    auto canvasSize = canvas->getSize();
+                    auto canvasSizeU = sf::Vector2u(canvasSize.x, canvasSize.y);
+                    pixbuf.resize(canvasSizeU);
+                    texture.create(canvasSizeU.x, canvasSizeU.y);
                     break;
                 }
                 case sf::Event::KeyPressed:
