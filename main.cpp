@@ -1,6 +1,8 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <cmath>
+#include <TGUI/TGUI.hpp>
+#include <TGUI/Backend/SFML-Graphics.hpp>
 #include "camera.h"
 #include "figures.h"
 
@@ -10,12 +12,17 @@ sf::Color background_color;
 int main() {
     background_color = sf::Color::White;
     sf::RenderWindow window(sf::VideoMode(600, 600), "SFML works!");
+    tgui::Gui gui(window);
+    auto canvas = tgui::CanvasSFML::create({500, 500});
+    gui.add(canvas);
+    canvas->setPosition({100, 100});
 
     sf::Texture texture;
-    auto window_size = window.getSize();
+    //auto window_size = window.getSize();
+    auto window_size = canvas->getSize();
     texture.create(window_size.x, window_size.y);
 
-    Pixbuf pixbuf(window_size);
+    Pixbuf pixbuf(sf::Vector2u(window_size.x, window_size.y));
     std::vector<Object *> objects;
 
     Object cube = createIcosahedron();
@@ -28,7 +35,7 @@ int main() {
                                            {0, 2},
                                            {0, 3}});
     //objects.push_back(&gizmos);
-    Camera cam({0, 0, -3}, &objects, window_size);
+    Camera cam({0, 0, -3}, &objects, sf::Vector2u(window_size.x, window_size.y));
     cam.setPixbuf(&pixbuf);
     cam.setProjection(Projection::Perspective);
 
@@ -39,10 +46,19 @@ int main() {
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
+            gui.handleEvent(event);
             switch (event.type) {
                 case sf::Event::Closed:
                     window.close();
                     break;
+                case sf::Event::Resized: {
+                    auto windowSize = window.getSize();
+                    auto canvasSize = sf::Vector2u(windowSize.x - 100, windowSize.y - 100);
+                    pixbuf.resize(canvasSize);
+                    texture.create(canvasSize.x, canvasSize.y);
+                    canvas->setSize({canvasSize.x, canvasSize.y});
+                    break;
+                }
                 case sf::Event::KeyPressed:
                     switch (event.key.code) {
                         case sf::Keyboard::Key::A:
@@ -116,7 +132,10 @@ int main() {
         window.clear();
         cam.render();
         texture.update(pixbuf.raw());
-        window.draw(sf::Sprite(texture));
+        canvas->clear(sf::Color::White);
+        canvas->draw(sf::Sprite(texture));
+        canvas->display();
+        gui.draw();
         window.display();
     }
     return 0;
