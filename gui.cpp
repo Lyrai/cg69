@@ -1,10 +1,9 @@
 #include "gui.h"
+#include "figures.h"
 
 enum class Mode;
 
-extern Mode mode;
-
-void setupGui(Object& cube, Camera& cam) {
+void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     auto canvas = tgui::CanvasSFML::create({"100%", "100%"});
     gui.add(canvas);
     auto window_size = canvas->getSize();
@@ -216,24 +215,6 @@ void setupGui(Object& cube, Camera& cam) {
 
 
 
-    texture.create(window_size.x, window_size.y);
-
-    Pixbuf pixbuf(sf::Vector2u(window_size.x, window_size.y));
-    std::vector<Object *> objects;
-
-    Object cube = createIcosahedron();
-//  Object cube = createCube();
-    objects.push_back(&cube);
-    Object gizmos({0, 0, 0}, {{0, 0, 0},
-                              {1, 0, 0},
-                              {0, 1, 0},
-                              {0, 0, 1}}, {{0, 1},
-                                           {0, 2},
-                                           {0, 3}});
-    //objects.push_back(&gizmos);
-    Camera cam({0, 0, -3}, &objects, sf::Vector2u(window_size.x, window_size.y));
-    cam.setPixbuf(&pixbuf);
-    cam.setProjection(Projection::Perspective);
 
     parallelButton->onClick([&cam]() { cam.setProjection(Projection::Parallel); });
     perspectiveButton->onClick([&cam]() { cam.setProjection(Projection::Perspective); });

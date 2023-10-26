@@ -15,6 +15,6 @@ enum class Mode{
     Mirror
 };
 
-void setupGui(tgui::Gui& gui, Object& cube, Camera& cam);
+void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode);
 
 #endif //CG6_GUI_H

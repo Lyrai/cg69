@@ -9,21 +9,37 @@
 
 
 sf::Color background_color;
-Mode mode;
 
 int main() {
     background_color = sf::Color::White;
     sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFML works!");
     sf::Texture texture;
-    //auto window_size = window.getSize();
+    auto window_size = window.getSize();
     tgui::Gui gui(window);
+    Mode mode;
 
+    texture.create(window_size.x, window_size.y);
 
+    Pixbuf pixbuf(sf::Vector2u(window_size.x, window_size.y));
+    std::vector<Object *> objects;
 
-
+    Object cube = createIcosahedron();
+//  Object cube = createCube();
+    objects.push_back(&cube);
+    Object gizmos({0, 0, 0}, {{0, 0, 0},
+                              {1, 0, 0},
+                              {0, 1, 0},
+                              {0, 0, 1}}, {{0, 1},
+                                           {0, 2},
+                                           {0, 3}});
+    //objects.push_back(&gizmos);
+    Camera cam({0, 0, -3}, &objects, sf::Vector2u(window_size.x, window_size.y));
+    cam.setPixbuf(&pixbuf);
+    cam.setProjection(Projection::Perspective);
     //texture.update(pixbuf.raw());
     sf::Vector3f vm(0, 0, 0);
     Line l({0, 0, 0}, {2, 2, 2});
+    setupGui(gui, cube, cam, mode);
 
     while (window.isOpen()) {
         sf::Event event;
