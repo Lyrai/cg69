@@ -70,8 +70,8 @@ std::vector<sf::Vector3f> Camera::projectionTransform(const std::vector<sf::Vect
 std::vector<sf::Vector2i> Camera::mapToScreen(const std::vector<sf::Vector2f> &projected) const {
     std::vector<sf::Vector2i> result;
     auto viewPlane = topRight - bottomLeft;
-    auto kx = screenSize.x / viewPlane.x;
-    auto ky = screenSize.y / viewPlane.y;
+    auto kx = pixbuf->size.x / viewPlane.x;
+    auto ky = pixbuf->size.y / viewPlane.y;
     for(const auto& vec: projected) {
         result.emplace_back((vec.x + viewPlane.x / 2) * kx, (vec.y + viewPlane.y / 2) * ky);
     }

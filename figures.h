@@ -5,8 +5,8 @@
 #include "object.h"
 
 Object createCube();
-Object createOctahedron();
 Object createTetrahedron();
+Object createOctahedron();
 Object createIcosahedron();
 Object createDodecahedron();
 Object createShelestStar();
