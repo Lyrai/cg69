@@ -5,8 +5,8 @@ enum class Mode;
 
 void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     auto canvas = tgui::CanvasSFML::create({"100%", "100%"});
+    canvas->setWidgetName("canvas");
     gui.add(canvas);
-    auto window_size = canvas->getSize();
     auto layoutMain = tgui::HorizontalLayout::create({"100%", "5%"});
     auto layoutProjection = tgui::HorizontalLayout::create({"100%", "5%"});
     auto layoutTransformation = tgui::HorizontalLayout::create({"100%", "5%"});
@@ -87,19 +87,21 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
 
     //Figures
     auto cubeButton = tgui::Button::create("Cube");
-    cubeButton->setTextSize(20);
     auto tetrahedronButton = tgui::Button::create("Tetrahedron");
-    tetrahedronButton->setTextSize(20);
     auto octahedronButton = tgui::Button::create("Octahedron");
-    octahedronButton->setTextSize(20);
     auto icosahedronButton = tgui::Button::create("Icosahedron");
-    icosahedronButton->setTextSize(20);
     auto dodecahedronButton = tgui::Button::create("Dodecahedron");
-    dodecahedronButton->setTextSize(18);
     auto shelestStarButton = tgui::Button::create("Star");
-    shelestStarButton->setTextSize(20);
     auto backButtonFig = tgui::Button::create("Back");
+
+    cubeButton->setTextSize(20);
+    tetrahedronButton->setTextSize(20);
+    octahedronButton->setTextSize(20);
+    icosahedronButton->setTextSize(20);
+    dodecahedronButton->setTextSize(18);
+    shelestStarButton->setTextSize(20);
     backButtonFig->setTextSize(20);
+
 
     layoutFigures->add(cubeButton);
     layoutFigures->add(tetrahedronButton);
@@ -108,7 +110,6 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     layoutFigures->add(dodecahedronButton);
     layoutFigures->add(shelestStarButton);
     layoutFigures->add(backButtonFig);
-
 
 
     layoutFigures->insertSpace(0, 0.025);
@@ -124,14 +125,14 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
 
     //Rotation
     auto rotateAxisButton = tgui::Button::create("Axis");
-    rotateAxisButton->setTextSize(20);
     auto rotateCenterButton = tgui::Button::create("Center");
-    rotateCenterButton->setTextSize(20);
     auto rotateLineButton = tgui::Button::create("Line");
-    rotateLineButton->setTextSize(20);
     auto backButtonRot = tgui::Button::create("Back");
-    backButtonRot->setTextSize(20);
 
+    rotateAxisButton->setTextSize(20);
+    rotateCenterButton->setTextSize(20);
+    rotateLineButton->setTextSize(20);
+    backButtonRot->setTextSize(20);
 
 
     layoutRotation->add(rotateAxisButton);
@@ -153,18 +154,28 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     auto rotateArea4 = tgui::EditBox::create();
     auto rotateArea5 = tgui::EditBox::create();
     auto rotateArea6 = tgui::EditBox::create();
+
+    rotateArea1->setWidgetName("x1");
+    rotateArea2->setWidgetName("y1");
+    rotateArea3->setWidgetName("z1");
+    rotateArea4->setWidgetName("x2");
+    rotateArea5->setWidgetName("y2");
+    rotateArea6->setWidgetName("z2");
+
     auto text1 = tgui::Label::create("x1");
     auto text2 = tgui::Label::create("y1");
     auto text3 = tgui::Label::create("z1");
     auto text4 = tgui::Label::create("x2");
     auto text5 = tgui::Label::create("y2");
     auto text6 = tgui::Label::create("z2");
+
     text1->setTextSize(20);
     text2->setTextSize(20);
     text3->setTextSize(20);
     text4->setTextSize(20);
     text5->setTextSize(20);
     text6->setTextSize(20);
+
     text1->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Right);
     text1->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
     text2->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Right);
@@ -177,9 +188,6 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     text5->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
     text6->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Right);
     text6->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-
-
-
 
 
     layoutInput->add(text1);
@@ -207,13 +215,6 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     layoutInput->add(rotateArea6);
     layoutInput->addSpace(0.05);
     layoutInput->setVisible(false);
-
-
-
-
-
-
-
 
 
     parallelButton->onClick([&cam]() { cam.setProjection(Projection::Parallel); });

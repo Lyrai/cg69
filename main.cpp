@@ -41,6 +41,14 @@ int main() {
     Line l({0, 0, 0}, {2, 2, 2});
     setupGui(gui, cube, cam, mode);
 
+    auto canvas = gui.get<tgui::CanvasSFML>("canvas");
+    auto x1Input = gui.get<tgui::EditBox>("x1");
+    auto y1Input = gui.get<tgui::EditBox>("y1");
+    auto z1Input = gui.get<tgui::EditBox>("z1");
+    auto x2Input = gui.get<tgui::EditBox>("x2");
+    auto y2Input = gui.get<tgui::EditBox>("y2");
+    auto z2Input = gui.get<tgui::EditBox>("z2");
+
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -69,10 +77,10 @@ int main() {
                                     break;
                                 }
                                 case Mode::Line: {
-                                    Line l(sf::Vector3f(rotateArea1->getText().toFloat(), rotateArea2->getText().toFloat(),
-                                                        rotateArea3->getText().toFloat()),
-                                           sf::Vector3f(rotateArea4->getText().toFloat(), rotateArea5->getText().toFloat(),
-                                                        rotateArea6->getText().toFloat()));
+                                    Line l(sf::Vector3f(x1Input->getText().toFloat(), y1Input->getText().toFloat(),
+                                                        z1Input->getText().toFloat()),
+                                           sf::Vector3f(x2Input->getText().toFloat(), y2Input->getText().toFloat(),
+                                                        z2Input->getText().toFloat()));
                                     cube.rotateAround(&l, -1);
                                     break;
                                 }
@@ -101,10 +109,10 @@ int main() {
                                     break;
                                 }
                                 case Mode::Line: {
-                                    Line l(sf::Vector3f(rotateArea1->getText().toFloat(), rotateArea2->getText().toFloat(),
-                                                        rotateArea3->getText().toFloat()),
-                                           sf::Vector3f(rotateArea4->getText().toFloat(), rotateArea5->getText().toFloat(),
-                                                        rotateArea6->getText().toFloat()));
+                                    Line l(sf::Vector3f(x1Input->getText().toFloat(), y1Input->getText().toFloat(),
+                                                        z1Input->getText().toFloat()),
+                                           sf::Vector3f(x2Input->getText().toFloat(), y2Input->getText().toFloat(),
+                                                        z2Input->getText().toFloat()));
                                     cube.rotateAround(&l, 1);
                                     break;
                                 }
@@ -193,15 +201,15 @@ int main() {
                         case sf::Keyboard::Key::Space:
                             switch (mode) {
                                 case Mode::Axis:{
-                                    cube.rotateAroundX(rotateArea1->getText().toFloat());
-                                    cube.rotateAroundY(rotateArea2->getText().toFloat());
-                                    cube.rotateAroundZ(rotateArea3->getText().toFloat());
+                                    cube.rotateAroundX(x1Input->getText().toFloat(0));
+                                    cube.rotateAroundY(y1Input->getText().toFloat(0));
+                                    cube.rotateAroundZ(z1Input->getText().toFloat(0));
                                     break;
                                 }
                                 case Mode::Center:{
-                                    cube.rotateAroundLine(rotateArea1->getText().toFloat(),Axis::X);
-                                    cube.rotateAroundLine(rotateArea2->getText().toFloat(),Axis::Y);
-                                    cube.rotateAroundLine(rotateArea3->getText().toFloat(),Axis::Z);
+                                    cube.rotateAroundLine(x1Input->getText().toFloat(0),Axis::X);
+                                    cube.rotateAroundLine(y1Input->getText().toFloat(0),Axis::Y);
+                                    cube.rotateAroundLine(z1Input->getText().toFloat(0),Axis::Z);
                                     break;
                                 }
                             }
