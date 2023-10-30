@@ -61,6 +61,7 @@ int main() {
                     auto canvasSize = canvas->getSize();
                     auto canvasSizeU = sf::Vector2u(canvasSize.x, canvasSize.y);
                     pixbuf.resize(canvasSizeU);
+                    cam.resize(canvasSizeU);
                     texture.create(canvasSizeU.x, canvasSizeU.y);
                     break;
                 }

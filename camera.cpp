@@ -76,8 +76,8 @@ std::vector<sf::Vector3f> Camera::projectionTransform(const std::vector<sf::Vect
 
 std::vector<sf::Vector2i> Camera::mapToScreen(const std::vector<sf::Vector2f> &projected) const {
     std::vector<sf::Vector2i> result;
-    auto kx = pixbuf->size.x / projectionPlaneSize.x;
-    auto ky = pixbuf->size.y / projectionPlaneSize.y;
+    auto kx = screenSize.x / projectionPlaneSize.x;
+    auto ky = screenSize.y / projectionPlaneSize.y;
     for(const auto& vec: projected) {
         result.emplace_back((vec.x + projectionPlaneSize.x / 2) * kx, (vec.y + projectionPlaneSize.y / 2) * ky);
     }
@@ -171,4 +171,7 @@ sf::Vector3f Camera::planeIntersection(const sf::Vector3f &begin, const sf::Vect
 
 void Camera::resize(const sf::Vector2u &newSize) {
     screenSize = newSize;
+
+    auto screenRatio = (float)screenSize.y / screenSize.x;
+    projectionPlaneSize.y = projectionPlaneSize.x * screenRatio;
 }
