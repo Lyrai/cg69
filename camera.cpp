@@ -4,8 +4,15 @@
 #include "algorithm.h"
 
 Camera::Camera(const sf::Vector3f &position, std::vector<Object*>* objects, const sf::Vector2u& screenSize)
-    : Transform(position), objects(objects), localPosition(sf::Vector3f(0, 0, -8)), topRight(2.5, 2.5, 0), bottomLeft(-2.5, -2.5, 0), screenSize(screenSize)
-{ }
+    : Transform(position), objects(objects), localPosition(sf::Vector3f(0, 0, -3)), projectionPlaneSize(5, 5), screenSize(screenSize), viewAngle(90)
+{
+    auto obj = Object({}, {{0, 0, -localPosition.z}}, {});
+    auto vertices = obj.rotatedAroundY(viewAngle / 2);
+    auto projectionPlane = planeIntersection(localPosition, vertices[0], 0);
+    projectionPlaneSize.x = std::abs(projectionPlane.x * 2);
+    auto screenRatio = (float)screenSize.y / screenSize.x;
+    projectionPlaneSize.y = projectionPlaneSize.x * screenRatio;
+}
 
 void Camera::render() const {
     pixbuf->fill(sf::Color::White);
@@ -69,11 +76,10 @@ std::vector<sf::Vector3f> Camera::projectionTransform(const std::vector<sf::Vect
 
 std::vector<sf::Vector2i> Camera::mapToScreen(const std::vector<sf::Vector2f> &projected) const {
     std::vector<sf::Vector2i> result;
-    auto viewPlane = topRight - bottomLeft;
-    auto kx = pixbuf->size.x / viewPlane.x;
-    auto ky = pixbuf->size.y / viewPlane.y;
+    auto kx = pixbuf->size.x / projectionPlaneSize.x;
+    auto ky = pixbuf->size.y / projectionPlaneSize.y;
     for(const auto& vec: projected) {
-        result.emplace_back((vec.x + viewPlane.x / 2) * kx, (vec.y + viewPlane.y / 2) * ky);
+        result.emplace_back((vec.x + projectionPlaneSize.x / 2) * kx, (vec.y + projectionPlaneSize.y / 2) * ky);
     }
 
     return result;
@@ -117,7 +123,7 @@ std::vector<sf::Vector3f> Camera::rotatedAroundY(float angle) {
 Object *Camera::clip(const std::vector<sf::Vector3f> &transformedVertices, Object *obj) const {
     std::vector<std::pair<int, int>> edges;
     std::vector<sf::Vector3f> vertices = transformedVertices;
-    auto clippingPlane = localPosition.z + 3;
+    auto clippingPlane = 0.f;
     for(const auto& edge: obj->edges()) {
         auto first = vertices[edge.first];
         auto second = vertices[edge.second];
@@ -130,28 +136,12 @@ Object *Camera::clip(const std::vector<sf::Vector3f> &transformedVertices, Objec
             continue;
         }
 
-        if(second.z < first.z) {
-            std::swap(first, second);
-        }
+        auto x = planeIntersection(first, second, clippingPlane);
 
-        auto normal = sf::Vector3f(0, 0, 1);
-        auto ca = sf::Vector3f(1, 1, clippingPlane) - first;
-        auto vcn = dot(ca, normal);
-        auto cv = second - first;
-        auto vcm = dot(cv, normal);
-        auto k = vcn / vcm;
-        if(k < 0) {
-            continue;
-        } else if(k > 1) {
-            edges.push_back(edge);
-            continue;
-        }
-        auto x = sf::Vector3f(cv.x * k, cv.y * k, cv.z * k);
-        x += first;
         auto newEdge = edge;
-        if(vertices[edge.first].z < clippingPlane) {
+        if(first.z < clippingPlane) {
             newEdge.first = vertices.size();
-        } else if(vertices[edge.second].z < clippingPlane) {
+        } else {
             newEdge.second = vertices.size();
         }
         vertices.push_back(x);
@@ -160,4 +150,25 @@ Object *Camera::clip(const std::vector<sf::Vector3f> &transformedVertices, Objec
     }
 
     return new Object({0, 0, 0}, vertices, edges);
+}
+
+sf::Vector3f Camera::planeIntersection(const sf::Vector3f &begin, const sf::Vector3f &end, float z) const {
+    auto first = begin;
+    auto second = end;
+
+    auto normal = sf::Vector3f(0, 0, 1);
+    auto ca = sf::Vector3f(1, 1, z) - first;
+    auto vcn = dot(ca, normal);
+    auto cv = second - first;
+    auto vcm = dot(cv, normal);
+    auto k = vcn / vcm;
+
+    auto x = sf::Vector3f(cv.x * k, cv.y * k, cv.z * k);
+    x += first;
+
+    return x;
+}
+
+void Camera::resize(const sf::Vector2u &newSize) {
+    screenSize = newSize;
 }
