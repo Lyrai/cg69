@@ -66,10 +66,10 @@ Object createOctahedron()
 Object createTetrahedron()
 {
     std::vector<sf::Vector3f> tetrahedronVertices{
-            {1.0, 1.0, 1.0},
-            {1.0, -1.0, -1.0},
-            {-1.0, 1.0, -1.0},
-            {-1.0, -1.0, 1.0}
+            {(float)sqrt(3)/2, 0, 0},
+            {0, 0.5, 0},
+            {0, -0.5, 0},
+            {(float)sqrt(3)/6, 0, (float)std::sqrt((float)2/3)}
     };
 
     std::vector<std::pair<int, int>> tetrahedronEdges{
