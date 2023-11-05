@@ -15,6 +15,8 @@ public:
     void setProjection(Projection proj);
     void setPixbuf(Pixbuf* buf) { pixbuf = buf; }
 
+    void resize(const sf::Vector2u& newSize);
+
     std::vector<sf::Vector3f> movedBy(const sf::Vector3f &v) const override;
     std::vector<sf::Vector3f> rotatedAround(Line *line, float cosa, float sina) const override;
     std::vector<sf::Vector3f> scaledAround(const sf::Vector3f &p, float kx, float ky, float kz) const override;
@@ -31,18 +33,19 @@ private:
     std::vector<sf::Vector2i> mapToScreen(const std::vector<sf::Vector2f>& projected) const;
     Object* clip(const std::vector<sf::Vector3f>& vertices, Object* obj) const;
     void draw(const std::vector<sf::Vector2i>& vertices, Object* obj) const;
+    sf::Vector3f planeIntersection(const sf::Vector3f& begin, const sf::Vector3f& end, float z) const;
 
 private:
     Projection projection;
     Matrix<4> projectionTransformMatrix;
     mutable Pixbuf* pixbuf;
     std::vector<Object*>* objects;
-    sf::Vector3f topRight;
-    sf::Vector3f bottomLeft;
+    sf::Vector2f projectionPlaneSize;
     sf::Vector3f localPosition;
     float scale;
     sf::Vector2u screenSize;
     mutable sf::Texture texture;
+    float viewAngle;
 
     static constexpr float projectionMatrix[16] {
             1, 0, 0, 0,

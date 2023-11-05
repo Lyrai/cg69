@@ -16,5 +16,7 @@ add_executable(cg6 main.cpp pixbuf.cpp pixel.cpp polygon.cpp line.cpp
         algorithm.cpp
         algorithm.h
         figures.h
-        figures.cpp)
-target_link_libraries(cg6 sfml-graphics sfml-window sfml-system nlohmann_json::nlohmann_json)
+        figures.cpp
+        gui.cpp
+        gui.h)
+target_link_libraries(cg6 sfml-graphics sfml-window sfml-system tgui)

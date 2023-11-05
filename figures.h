@@ -9,11 +9,8 @@
 using json = nlohmann::json;
 
 Object createCube();
-
-Object createOctahedron();
-
 Object createTetrahedron();
-
+Object createOctahedron();
 Object createIcosahedron();
 
 Object createDodecahedron();
