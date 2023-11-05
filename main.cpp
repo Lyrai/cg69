@@ -23,8 +23,9 @@ int main() {
     Pixbuf pixbuf(sf::Vector2u(window_size.x, window_size.y));
     std::vector<Object *> objects;
 
-    Object cube = createIcosahedron();
-//  Object cube = createCube();
+//    Object cube = createIcosahedron();
+    Object cube = parseFigure("figures/octahedron.json");
+//    Object cube = createCube();
     objects.push_back(&cube);
     Object gizmos({0, 0, 0}, {{0, 0, 0},
                               {1, 0, 0},
