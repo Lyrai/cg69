@@ -77,21 +77,17 @@ Object createCube() {
             {0.5,  0.5,  0.5},
             {-0.5, 0.5,  0.5},
     };
-    std::vector<std::pair<int, int>> cubeEdges{
-            {0, 1},
-            {1, 2},
-            {2, 3},
-            {3, 0},
-            {0, 4},
-            {1, 5},
-            {2, 6},
-            {3, 7},
-            {4, 5},
-            {5, 6},
-            {6, 7},
-            {7, 4}
+
+    Polygons cubePolygons {
+            {4, 5, 6, 7},
+            {0, 1, 2, 3},
+            {0, 1, 5, 4},
+            {0, 3, 7, 4},
+            {1, 2, 6, 5},
+            {3, 2, 6, 7}
     };
-    Object cube({0, 0, 0}, cubeVertices, cubeEdges);
+
+    Object cube({0, 0, 0}, cubeVertices, cubePolygons);
     return cube;
 }
 
@@ -105,7 +101,7 @@ Object createOctahedron() {
             {0.0,  0.0,  1.0}
     };
 
-    std::vector<std::pair<int, int>> octahedronEdges{
+    /*std::vector<std::pair<int, int>> octahedronEdges{
             {0, 1},
             {0, 2},
             {0, 3},
@@ -118,9 +114,20 @@ Object createOctahedron() {
             {2, 5},
             {3, 5},
             {4, 5}
+    };*/
+
+    Polygons octahedronPolygons {
+            {0, 1, 2},
+            {0, 1, 4},
+            {0, 2, 3},
+            {0, 3, 4},
+            {1, 2, 5},
+            {1, 4, 5},
+            {2, 3, 5},
+            {3, 4, 5}
     };
 
-    Object octahedron({0, 0, 0}, octahedronVertices, octahedronEdges);
+    Object octahedron({0, 0, 0}, octahedronVertices, octahedronPolygons);
     return octahedron;
 }
 
@@ -141,7 +148,14 @@ Object createTetrahedron() {
             {2, 3}
     };
 
-    Object tetrahedron({0, 0, 0}, tetrahedronVertices, tetrahedronEdges);
+    Polygons tetrahedronPolygons {
+            {0, 1, 2},
+            {0, 1, 3},
+            {0, 2, 3},
+            {1, 2, 3}
+    };
+
+    Object tetrahedron({0, 0, 0}, tetrahedronVertices, tetrahedronPolygons);
     return tetrahedron;
 }
 
@@ -195,7 +209,31 @@ Object createIcosahedron() {
             {1,  0},
             {1,  8}//30
     };
-    Object icosahedron({0, 0, 0}, icosahedronVertices, icosahedronEdges);
+
+    Polygons icosahedronPolygons {
+            {0, 1, 8},
+            {0, 1, 9},
+            {0, 4, 7},
+            {0, 4, 8},
+            {0, 7, 9},
+            {1, 5, 6},
+            {1, 5, 8},
+            {1, 6, 9},
+            {2, 3, 10},
+            {2, 3, 11},
+            {2, 5, 6},
+            {2, 5, 11},
+            {2, 6, 10},
+            {3, 4, 7},
+            {3, 4, 11},
+            {3, 7, 10},
+            {4, 8, 11},
+            {5, 8, 11},
+            {6, 9, 10},
+            {7, 9, 10}
+    };
+
+    Object icosahedron({0, 0, 0}, icosahedronVertices, icosahedronPolygons);
     return icosahedron;
 }
 
@@ -259,7 +297,23 @@ Object createShelestStar() {
             {19, 5},
             {19, 7}
     };
-    Object dodecahedron({0, 0, 0}, dodecahedronVertices, dodecahedronEdges);
+
+    Polygons starPolygons {
+            {16, 2, 10, 8, 0},
+            {12, 14, 4, 8, 0},
+            {16, 17, 1, 12, 0},
+            {17, 3, 11, 9, 1},
+            {12, 14, 5, 9, 1},
+            {13, 15, 6, 10, 2},
+            {16, 17, 3, 13, 2},
+            {13, 15, 7, 11, 3},
+            {18, 6, 10, 8, 4},
+            {18, 19, 5, 14, 4},
+            {19, 7, 11, 9, 5},
+            {18, 19, 7, 15, 6}
+    };
+
+    Object dodecahedron({0, 0, 0}, dodecahedronVertices, starPolygons);
     return dodecahedron;
 }
 
@@ -323,7 +377,23 @@ Object createDodecahedron() {
             {19, 5},
             {19, 7}
     };
-    Object dodecahedron({0, 0, 0}, dodecahedronVertices, dodecahedronEdges);
+
+    Polygons dodecahedronPolygons {
+            {16, 2, 10, 8, 0},
+            {12, 14, 4, 8, 0},
+            {16, 17, 1, 12, 0},
+            {17, 3, 11, 9, 1},
+            {12, 14, 5, 9, 1},
+            {13, 15, 6, 10, 2},
+            {16, 17, 3, 13, 2},
+            {13, 15, 7, 11, 3},
+            {18, 6, 10, 8, 4},
+            {18, 19, 5, 14, 4},
+            {19, 7, 11, 9, 5},
+            {18, 19, 7, 15, 6}
+    };
+
+    Object dodecahedron({0, 0, 0}, dodecahedronVertices, dodecahedronPolygons);
     return dodecahedron;
 }
 

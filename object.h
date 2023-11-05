@@ -4,9 +4,13 @@
 #include "polygon.h"
 #include "transform.h"
 
+using Edges = std::vector<std::pair<int, int>>;
+using Polygons = std::vector<std::vector<int>>;
+
 class Object: public Transform {
 public:
-    explicit Object(const sf::Vector3f& position, const std::vector<sf::Vector3f>& vertices, const std::vector<std::pair<int, int>>& indices);
+    explicit Object(const sf::Vector3f& position, const std::vector<sf::Vector3f>& vertices, const Edges& indices);
+    explicit Object(const sf::Vector3f& position, const std::vector<sf::Vector3f>& vertices, const Polygons& polygons);
 
     std::vector<sf::Vector3f> movedBy(const sf::Vector3f& v) const override;
     std::vector<sf::Vector3f> rotatedAround(Line* line, float cosa, float sina) const override;
@@ -22,7 +26,8 @@ public:
 
 private:
     std::vector<sf::Vector3f> _vertices;
-    std::vector<std::pair<int, int>> _edges;
+    Edges _edges;
+    Polygons _polygons;
 };
 
 

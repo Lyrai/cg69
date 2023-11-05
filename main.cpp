@@ -24,15 +24,15 @@ int main() {
     std::vector<Object *> objects;
 
 //    Object cube = createIcosahedron();
-    Object cube = parseFigure("figures/octahedron.json");
-//    Object cube = createCube();
+//    Object cube = parseFigure("figures/octahedron.json");
+    Object cube = createCube();
     objects.push_back(&cube);
     Object gizmos({0, 0, 0}, {{0, 0, 0},
                               {1, 0, 0},
                               {0, 1, 0},
-                              {0, 0, 1}}, {{0, 1},
-                                           {0, 2},
-                                           {0, 3}});
+                              {0, 0, 1}}, Edges({{0, 1},
+                                                 {0, 2},
+                                                 {0, 3}}));
     //objects.push_back(&gizmos);
     Camera cam({0, 0, -3}, &objects, sf::Vector2u(window_size.x, window_size.y));
     cam.setPixbuf(&pixbuf);
