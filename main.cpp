@@ -6,6 +6,7 @@
 #include "camera.h"
 #include "figures.h"
 #include "gui.h"
+#include "expressionparser.h"
 
 
 sf::Color background_color;
@@ -49,6 +50,45 @@ int main() {
     auto x2Input = gui.get<tgui::EditBox>("x2");
     auto y2Input = gui.get<tgui::EditBox>("y2");
     auto z2Input = gui.get<tgui::EditBox>("z2");
+    auto formulaInput = gui.get<tgui::EditBox>("formula");
+
+    auto x0 = -2.f;
+    auto x1 = 2.f;
+    auto y0 = -2.f;
+    auto y1 = 2.f;
+    auto steps = 50;
+
+
+    formulaInput->onTextChange([=, &cube]() {
+        if(formulaInput->getText().size() == 0) {
+            return;
+        }
+        ExpressionParser parser;
+        Expression expr = parser.parse(formulaInput->getText().toStdString());
+        if(!expr.isValid()) {
+            return;
+        }
+        auto ystep = (y1 - y0) / steps;
+        auto xstep = (x1 - x0) / steps;
+
+        std::vector<sf::Vector3f> points;
+        for(int i = 0; i < steps; ++i) {
+            auto y = y0 + ystep * i;
+            for(int j = 0; j < steps; ++j) {
+                auto x = x0 + xstep * j;
+                points.emplace_back(x, -(float)expr.evaluate(x, y), y);
+            }
+        }
+
+        Polygons polygons;
+        for(int i = 0; i < steps - 1; ++i) {
+            for(int j = 0; j < steps - 1; ++j) {
+                polygons.emplace_back(std::vector<int> {steps * j + i, steps * j + i + 1, steps * (j + 1) + i + 1, steps * (j + 1) + i});
+            }
+        }
+
+        cube = Object({0, 0, 0}, points, polygons);
+    });
 
     while (window.isOpen()) {
         sf::Event event;

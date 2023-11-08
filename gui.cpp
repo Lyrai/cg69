@@ -13,12 +13,15 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     auto layoutFigures = tgui::HorizontalLayout::create({"100%", "5%"});
     auto layoutRotation = tgui::HorizontalLayout::create({"100%", "5%"});
     auto layoutInput = tgui::HorizontalLayout::create({"40%", "3%"});
+    auto layoutGraphInput = tgui::Group::create({"40%", "3%"});
     layoutInput->setPosition("0%","7%");
+    layoutGraphInput->setPosition("0%","7%");
     layoutProjection->setVisible(false);
     layoutTransformation->setVisible(false);
     layoutFigures->setVisible(false);
     layoutRotation->setVisible(false);
     layoutInput->setVisible(false);
+    layoutGraphInput->setVisible(false);
 
     gui.add(layoutMain);
     gui.add(layoutProjection);
@@ -26,6 +29,7 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     gui.add(layoutFigures);
     gui.add(layoutRotation);
     gui.add(layoutInput);
+    gui.add(layoutGraphInput);
 
     //Main
     auto projectionButton = tgui::Button::create("Projections");
@@ -34,15 +38,19 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     transformationButton->setTextSize(20);
     auto figuresButton = tgui::Button::create("Figures");
     figuresButton->setTextSize(20);
+    auto graphButton = tgui::Button::create("Graph");
+    graphButton->setTextSize(20);
 
     layoutMain->add(projectionButton);
     layoutMain->add(transformationButton);
     layoutMain->add(figuresButton);
+    layoutMain->add(graphButton);
 
     layoutMain->insertSpace(0, 0.025);
     layoutMain->insertSpace(2, 0.025);
     layoutMain->insertSpace(4, 0.025);
     layoutMain->insertSpace(6, 0.025);
+    layoutMain->insertSpace(8, 0.025);
 
 
     //Projection
@@ -217,19 +225,40 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     layoutInput->setVisible(false);
 
 
+    auto graphLabelZ = tgui::Label::create("z = ");
+    auto graphInputFormula = tgui::EditBox::create();
+
+    graphInputFormula->setWidgetName("formula");
+    graphLabelZ->setTextSize(20);
+    graphInputFormula->setTextSize(16);
+    graphInputFormula->setPosition(graphLabelZ->getSize().x + 8, graphLabelZ->getPosition().y);
+    graphInputFormula->setSize({"80%", "80%"});
+
+    graphLabelZ->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+
+    layoutGraphInput->add(graphLabelZ);
+    layoutGraphInput->add(graphInputFormula);
+
+
     parallelButton->onClick([&cam]() { cam.setProjection(Projection::Parallel); });
     perspectiveButton->onClick([&cam]() { cam.setProjection(Projection::Perspective); });
     projectionButton->onClick([=]() {
         layoutMain->setVisible(false);
+        layoutGraphInput->setVisible(false);
         layoutProjection->setVisible(true);
     });
     transformationButton->onClick([=]() {
         layoutMain->setVisible(false);
+        layoutGraphInput->setVisible(false);
         layoutTransformation->setVisible(true);
     });
     figuresButton->onClick([=]() {
         layoutMain->setVisible(false);
+        layoutGraphInput->setVisible(false);
         layoutFigures->setVisible(true);
+    });
+    graphButton->onClick([=]() {
+        layoutGraphInput->setVisible(true);
     });
     backButtonProj->onClick([=]() {
         layoutProjection->setVisible(false);
