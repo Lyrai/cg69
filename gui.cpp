@@ -14,6 +14,10 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     auto layoutRotation = tgui::HorizontalLayout::create({"100%", "5%"});
     auto layoutInput = tgui::HorizontalLayout::create({"40%", "3%"});
     auto layoutGraphInput = tgui::Group::create({"40%", "3%"});
+    auto fps = tgui::Label::create();
+    fps->setTextSize(20);
+    fps->setPosition("95%", "7%");
+    fps->setWidgetName("fps");
     layoutInput->setPosition("0%","7%");
     layoutGraphInput->setPosition("0%","7%");
     layoutProjection->setVisible(false);
@@ -30,6 +34,7 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     gui.add(layoutRotation);
     gui.add(layoutInput);
     gui.add(layoutGraphInput);
+    gui.add(fps);
 
     //Main
     auto projectionButton = tgui::Button::create("Projections");

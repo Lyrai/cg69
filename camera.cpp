@@ -19,19 +19,13 @@ void Camera::render() const {
 
     for(auto object: *objects) {
         auto viewSpace = object->transformed(object->objectToWorldMatrix() * worldToObjectMatrix());
-        std::vector<sf::Vector3f> transformed;
-        Object* clipped = nullptr;
-        if(projection == Projection::Perspective) {
-            clipped = clip(viewSpace, object);
-            transformed = projectionTransform(clipped->vertices());
-        } else {
-            transformed = projectionTransform(viewSpace);
-        }
+        Object clipped({}, {}, {});
+        clip(viewSpace, object, clipped);
 
+        auto transformed = projectionTransform(clipped.vertices());
         auto projected = project(transformed);
         auto mapped = mapToScreen(projected);
-        draw(mapped, projection == Projection::Perspective ? clipped : object);
-        delete clipped;
+        draw(mapped, &clipped);
     }
 }
 
@@ -70,7 +64,7 @@ void Camera::setProjection(Projection proj) {
 }
 
 std::vector<sf::Vector3f> Camera::projectionTransform(const std::vector<sf::Vector3f> &obj) const {
-    return Transform::transformed(obj, projectionTransformMatrix);
+    return Object::transformed(obj, projectionTransformMatrix);
 }
 
 std::vector<sf::Vector2i> Camera::mapToScreen(const std::vector<sf::Vector2f> &projected) const {
@@ -101,7 +95,7 @@ std::vector<sf::Vector3f> Camera::transformed(const Matrix<4> &m) const {
 }
 
 std::vector<sf::Vector2f> Camera::project(const std::vector<sf::Vector3f> &vertices) const {
-    auto projected = Transform::transformed(vertices, projectionMatrix);
+    auto projected = Object::transformed(vertices, projectionMatrix);
     std::vector<sf::Vector2f> result;
     result.reserve(projected.size());
     for(const auto vec: projected) {
@@ -119,8 +113,9 @@ std::vector<sf::Vector3f> Camera::rotatedAroundY(float angle) {
     return std::vector<sf::Vector3f>();
 }
 
-Object *Camera::clip(const std::vector<sf::Vector3f> &transformedVertices, Object *obj) const {
+void Camera::clip(const std::vector<sf::Vector3f> &transformedVertices, Object *obj, Object& result) const {
     std::vector<std::pair<int, int>> edges;
+    edges.reserve(obj->edges().size());
     std::vector<sf::Vector3f> vertices = transformedVertices;
     auto clippingPlane = 0.f;
     for(const auto& edge: obj->edges()) {
@@ -148,7 +143,7 @@ Object *Camera::clip(const std::vector<sf::Vector3f> &transformedVertices, Objec
         edges.push_back(newEdge);
     }
 
-    return new Object({0, 0, 0}, vertices, edges);
+    result = std::move(Object({0, 0, 0}, std::move(vertices), std::move(edges)));
 }
 
 sf::Vector3f Camera::planeIntersection(const sf::Vector3f &begin, const sf::Vector3f &end, float z) const {

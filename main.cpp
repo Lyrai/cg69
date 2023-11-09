@@ -3,6 +3,7 @@
 #include <cmath>
 #include <TGUI/TGUI.hpp>
 #include <TGUI/Backend/SFML-Graphics.hpp>
+#include <chrono>
 #include "camera.h"
 #include "figures.h"
 #include "gui.h"
@@ -10,6 +11,7 @@
 
 
 sf::Color background_color;
+using namespace std::chrono;
 
 int main() {
     background_color = sf::Color::White;
@@ -93,6 +95,8 @@ int main() {
         cube = Object({0, 0, 0}, points, polygons);
     });
 
+    auto prev = high_resolution_clock::now();
+    auto fps = gui.get<tgui::Label>("fps");
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -270,6 +274,9 @@ int main() {
         canvas->clear(sf::Color::White);
         canvas->draw(sf::Sprite(texture));
         canvas->display();
+        auto diff = duration_cast<milliseconds>(high_resolution_clock::now() - prev).count();
+        prev = high_resolution_clock::now();
+        fps->setText(tgui::String(1000 / diff));
         gui.draw();
         window.display();
     }
