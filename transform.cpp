@@ -229,3 +229,16 @@ void Transform::rotateAround(Line *line, float angle) {
 
     moveBy(tmp);
 }
+
+std::vector<sf::Vector3f> Transform::transformed(const std::vector<sf::Vector3f>& vertices, const Matrix<4> &m) {
+    std::vector<sf::Vector3f> result;
+    result.reserve(vertices.size());
+
+    for(int i = 0; i < vertices.size(); ++i) {
+        auto tmp = sf::Vector4f(vertices[i].x, vertices[i].y, vertices[i].z, 1);
+        auto v4 = tmp * m;
+        result.emplace_back(v4.x / v4.w, v4.y / v4.w, v4.z / v4.w);
+    }
+
+    return result;
+}

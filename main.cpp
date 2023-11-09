@@ -52,11 +52,14 @@ int main() {
     auto z2Input = gui.get<tgui::EditBox>("z2");
     auto formulaInput = gui.get<tgui::EditBox>("formula");
 
-    auto x0 = -2.f;
-    auto x1 = 2.f;
-    auto y0 = -2.f;
-    auto y1 = 2.f;
-    auto steps = 50;
+    auto x0 = -7.f;
+    auto x1 = 7.f;
+    auto y0 = -7.f;
+    auto y1 = 7.f;
+    auto steps = 1000;
+
+    //5 * (cos(x^2 + y^2 + 1) / (x^2 + y^2 + 1) + 0.1)
+    //cos(x^2 + y^2) / (x^2 + y^2 + 1)
 
 
     formulaInput->onTextChange([=, &cube]() {

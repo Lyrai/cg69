@@ -4,7 +4,7 @@
 #include "algorithm.h"
 
 Camera::Camera(const sf::Vector3f &position, std::vector<Object*>* objects, const sf::Vector2u& screenSize)
-    : Transform(position), objects(objects), localPosition(sf::Vector3f(0, 0, -3)), projectionPlaneSize(5, 5), screenSize(screenSize), viewAngle(90)
+    : Transform(position), objects(objects), localPosition(sf::Vector3f(0, 0, -3)), projectionPlaneSize(5, 5), screenSize(screenSize), viewAngle(120)
 {
     auto obj = Object({}, {{0, 0, -localPosition.z}}, Edges());
     auto vertices = obj.rotatedAroundY(viewAngle / 2);
@@ -70,7 +70,7 @@ void Camera::setProjection(Projection proj) {
 }
 
 std::vector<sf::Vector3f> Camera::projectionTransform(const std::vector<sf::Vector3f> &obj) const {
-    return Object({0,0,0}, obj, Edges()).transformed(projectionTransformMatrix);
+    return Transform::transformed(obj, projectionTransformMatrix);
 }
 
 std::vector<sf::Vector2i> Camera::mapToScreen(const std::vector<sf::Vector2f> &projected) const {
@@ -101,7 +101,7 @@ std::vector<sf::Vector3f> Camera::transformed(const Matrix<4> &m) const {
 }
 
 std::vector<sf::Vector2f> Camera::project(const std::vector<sf::Vector3f> &vertices) const {
-    auto projected = Object({0,0,0}, vertices, Edges()).transformed(projectionMatrix);
+    auto projected = Transform::transformed(vertices, projectionMatrix);
     std::vector<sf::Vector2f> result;
     result.reserve(projected.size());
     for(const auto vec: projected) {

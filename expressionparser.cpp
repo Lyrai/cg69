@@ -128,6 +128,7 @@ void ExpressionParser::expression()
     }
 
     term();
+    CHECK_ERROR
 }
 
 void ExpressionParser::term()
@@ -145,6 +146,7 @@ void ExpressionParser::term()
 
         ++position;
         factor();
+        CHECK_ERROR
 
         operations.push_back(operation);
     }
@@ -166,6 +168,7 @@ void ExpressionParser::factor()
 
         ++position;
         power();
+        CHECK_ERROR
 
         operations.push_back(operation);
     }

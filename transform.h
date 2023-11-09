@@ -47,6 +47,7 @@ public:
     virtual std::vector<sf::Vector3f> transformed(const Matrix<3> &m, const sf::Vector3f &v) const;
 
     virtual std::vector<sf::Vector3f> transformed(const Matrix<4> &m) const = 0;
+    static std::vector<sf::Vector3f> transformed(const std::vector<sf::Vector3f>& vertices, const Matrix<4> &m);
 
     Matrix<4> objectToWorldMatrix() const;
 
@@ -59,6 +60,7 @@ private:
     mutable Matrix<4> objectToWorld;
     mutable Matrix<4> worldToObject;
 };
+
 
 
 #endif //CG6_TRANSFORM_H
