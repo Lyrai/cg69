@@ -3,12 +3,15 @@
 #include <cmath>
 #include <TGUI/TGUI.hpp>
 #include <TGUI/Backend/SFML-Graphics.hpp>
+#include <chrono>
 #include "camera.h"
 #include "figures.h"
 #include "gui.h"
+#include "expressionparser.h"
 
 
 sf::Color background_color;
+using namespace std::chrono;
 
 int main() {
     background_color = sf::Color::White;
@@ -23,15 +26,16 @@ int main() {
     Pixbuf pixbuf(sf::Vector2u(window_size.x, window_size.y));
     std::vector<Object *> objects;
 
-    Object cube = createIcosahedron();
-//  Object cube = createCube();
+//    Object cube = createIcosahedron();
+//    Object cube = parseFigure("figures/octahedron.json");
+    Object cube = createCube();
     objects.push_back(&cube);
     Object gizmos({0, 0, 0}, {{0, 0, 0},
                               {1, 0, 0},
                               {0, 1, 0},
-                              {0, 0, 1}}, {{0, 1},
-                                           {0, 2},
-                                           {0, 3}});
+                              {0, 0, 1}}, Edges({{0, 1},
+                                                 {0, 2},
+                                                 {0, 3}}));
     //objects.push_back(&gizmos);
     Camera cam({0, 0, -3}, &objects, sf::Vector2u(window_size.x, window_size.y));
     cam.setPixbuf(&pixbuf);
@@ -48,7 +52,51 @@ int main() {
     auto x2Input = gui.get<tgui::EditBox>("x2");
     auto y2Input = gui.get<tgui::EditBox>("y2");
     auto z2Input = gui.get<tgui::EditBox>("z2");
+    auto formulaInput = gui.get<tgui::EditBox>("formula");
 
+    auto x0 = -7.f;
+    auto x1 = 7.f;
+    auto y0 = -7.f;
+    auto y1 = 7.f;
+    auto steps = 1000;
+
+    //5 * (cos(x^2 + y^2 + 1) / (x^2 + y^2 + 1) + 0.1)
+    //cos(x^2 + y^2) / (x^2 + y^2 + 1)
+
+
+    formulaInput->onTextChange([=, &cube]() {
+        if(formulaInput->getText().size() == 0) {
+            return;
+        }
+        ExpressionParser parser;
+        Expression expr = parser.parse(formulaInput->getText().toStdString());
+        if(!expr.isValid()) {
+            return;
+        }
+        auto ystep = (y1 - y0) / steps;
+        auto xstep = (x1 - x0) / steps;
+
+        std::vector<sf::Vector3f> points;
+        for(int i = 0; i < steps; ++i) {
+            auto y = y0 + ystep * i;
+            for(int j = 0; j < steps; ++j) {
+                auto x = x0 + xstep * j;
+                points.emplace_back(x, -(float)expr.evaluate(x, y), y);
+            }
+        }
+
+        Polygons polygons;
+        for(int i = 0; i < steps - 1; ++i) {
+            for(int j = 0; j < steps - 1; ++j) {
+                polygons.emplace_back(std::vector<int> {steps * j + i, steps * j + i + 1, steps * (j + 1) + i + 1, steps * (j + 1) + i});
+            }
+        }
+
+        cube = Object({0, 0, 0}, points, polygons);
+    });
+
+    auto prev = high_resolution_clock::now();
+    auto fps = gui.get<tgui::Label>("fps");
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -226,6 +274,9 @@ int main() {
         canvas->clear(sf::Color::White);
         canvas->draw(sf::Sprite(texture));
         canvas->display();
+        auto diff = duration_cast<milliseconds>(high_resolution_clock::now() - prev).count();
+        prev = high_resolution_clock::now();
+        fps->setText(tgui::String(1000 / diff));
         gui.draw();
         window.display();
     }

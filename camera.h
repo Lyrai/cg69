@@ -31,7 +31,7 @@ private:
     std::vector<sf::Vector3f> projectionTransform(const std::vector<sf::Vector3f>& obj) const;
     std::vector<sf::Vector2f> project(const std::vector<sf::Vector3f>& vertices) const;
     std::vector<sf::Vector2i> mapToScreen(const std::vector<sf::Vector2f>& projected) const;
-    Object* clip(const std::vector<sf::Vector3f>& vertices, Object* obj) const;
+    void clip(const std::vector<sf::Vector3f>& vertices, Object* obj, Object& result) const;
     void draw(const std::vector<sf::Vector2i>& vertices, Object* obj) const;
     sf::Vector3f planeIntersection(const sf::Vector3f& begin, const sf::Vector3f& end, float z) const;
 
