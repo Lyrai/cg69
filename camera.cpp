@@ -4,7 +4,7 @@
 #include "algorithm.h"
 
 Camera::Camera(const sf::Vector3f &position, std::vector<Object*>* objects, const sf::Vector2u& screenSize)
-    : Transform(position), objects(objects), localPosition(sf::Vector3f(0, 0, -3)), projectionPlaneSize(5, 5), screenSize(screenSize), viewAngle(120)
+    : Transform(position), objects(objects), localPosition(sf::Vector3f(0, 0, -3)), projectionPlaneSize(5, 5), screenSize(screenSize), viewAngle(90)
 {
     auto obj = Object({}, {{0, 0, -localPosition.z}}, Edges());
     auto vertices = obj.rotatedAroundY(viewAngle / 2);
@@ -38,23 +38,6 @@ void Camera::draw(const std::vector<sf::Vector2i> &vertices, Object *obj) const 
 void Camera::setProjection(Projection proj) {
     projection = proj;
     if(proj == Projection::Parallel) {
-        /*auto phi = -45 * M_PI / 180;
-        auto theta = 35.26 * M_PI / 180;
-        Matrix<4> yRotate {{
-            (float)cos(phi), 0, (float)-sin(phi),0,
-            0,                  1, 0,                  0,
-            (float)sin(phi), 0, (float)cos(phi), 0,
-            0,                  0, 0,                  1
-        }};
-        Matrix<4> xRotate {{
-            1, 0,                    0,                    0,
-            0, (float)cos(theta), (float)sin(theta), 0,
-            0, (float)-sin(theta),(float)cos(theta), 0,
-            0, 0,                    0,                    1
-        }};
-
-        projectionTransformMatrix = yRotate * xRotate;*/
-        //projectionTransformMatrix = parallel;
         projectionTransformMatrix = Matrix<4>::identity();
     } else {
         Matrix<4> m = Matrix<4>::identity();
@@ -72,7 +55,7 @@ std::vector<sf::Vector2i> Camera::mapToScreen(const std::vector<sf::Vector2f> &p
     auto kx = screenSize.x / projectionPlaneSize.x;
     auto ky = screenSize.y / projectionPlaneSize.y;
     for(const auto& vec: projected) {
-        result.emplace_back((vec.x + projectionPlaneSize.x / 2) * kx, (vec.y + projectionPlaneSize.y / 2) * ky);
+        result.emplace_back((vec.x) * kx + screenSize.x / 2, (vec.y) * ky + screenSize.y / 2);
     }
 
     return result;
@@ -82,12 +65,12 @@ std::vector<sf::Vector3f> Camera::screenToMap(const std::vector<sf::Vector2i> &p
     auto kx = screenSize.x / projectionPlaneSize.x;
     auto ky = screenSize.y / projectionPlaneSize.y;
     for(const auto& vec: projected) {
-        sf::Vector3f temp((vec.x / kx - projectionPlaneSize.x / 2), (vec.y / ky - projectionPlaneSize.y / 2), 0);
+        sf::Vector2i v(vec.x - screenSize.x / 2 - 50, vec.y - screenSize.y / 2 - 64);
+        sf::Vector3f temp(v.x / kx, v.y / ky, 0);
         auto res = planeIntersection(localPosition, temp, -position.z);
         sf::Vector4f temp1(res.x, res.y, res.z, 1);
         auto res1 = temp1 * objectToWorldMatrix();
         result.emplace_back(res1.x / res1.w, res1.y / res1.w, res1.z / res1.w);
-        //result.push_back(temp);
     }
 
     return result;
