@@ -34,7 +34,6 @@ private:
     std::vector<sf::Vector2i> mapToScreen(const std::vector<sf::Vector2f>& projected) const;
     void clip(const std::vector<sf::Vector3f>& vertices, Object* obj, Object& result) const;
     void draw(const std::vector<sf::Vector2i>& vertices, Object* obj) const;
-    sf::Vector3f planeIntersection(const sf::Vector3f& begin, const sf::Vector3f& end, float z) const;
 
 private:
     Projection projection;

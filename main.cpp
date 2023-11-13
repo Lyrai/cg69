@@ -106,11 +106,11 @@ int main() {
         if(!pointsFig.empty()) {
             std::vector<sf::Vector3f> vertices;
             auto worldSpace = cam.screenToMap(pointsFig);
-            vertices.emplace_back(0, worldSpace[0].y, 0);
+            //vertices.emplace_back(0, worldSpace[0].y, 0);
             for (const auto &vertex: worldSpace) {
                 vertices.push_back(vertex);
             }
-            vertices.emplace_back(0, worldSpace[worldSpace.size() - 1].y, 0);
+            //vertices.emplace_back(0, worldSpace[worldSpace.size() - 1].y, 0);
             cube = constructRotationFigure(vertices, cam);
         }
     });

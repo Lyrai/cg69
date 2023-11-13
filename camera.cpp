@@ -31,9 +31,6 @@ void Camera::render() const {
 
 void Camera::draw(const std::vector<sf::Vector2i> &vertices, Object *obj) const {
     for(const auto edge: obj->edges()) {
-        if(edge.first >= vertices.size() || edge.second >= vertices.size()) {
-            std::cout << "Here" << std::endl;
-        }
         draw_line(*pixbuf, vertices[edge.first], vertices[edge.second], sf::Color::Black);
     }
 }
@@ -85,9 +82,12 @@ std::vector<sf::Vector3f> Camera::screenToMap(const std::vector<sf::Vector2i> &p
     auto kx = screenSize.x / projectionPlaneSize.x;
     auto ky = screenSize.y / projectionPlaneSize.y;
     for(const auto& vec: projected) {
-        sf::Vector4f temp((vec.x / kx - projectionPlaneSize.x / 2), (vec.y / ky - projectionPlaneSize.y / 2), 0, 0);
-        auto res = temp;
-        result.emplace_back(res.x, res.y, 0);
+        sf::Vector3f temp((vec.x / kx - projectionPlaneSize.x / 2), (vec.y / ky - projectionPlaneSize.y / 2), 0);
+        auto res = planeIntersection(localPosition, temp, -position.z);
+        sf::Vector4f temp1(res.x, res.y, res.z, 1);
+        auto res1 = temp1 * objectToWorldMatrix();
+        result.emplace_back(res1.x / res1.w, res1.y / res1.w, res1.z / res1.w);
+        //result.push_back(temp);
     }
 
     return result;
@@ -159,23 +159,6 @@ void Camera::clip(const std::vector<sf::Vector3f> &transformedVertices, Object *
     }
 
     result = std::move(Object({0, 0, 0}, std::move(vertices), std::move(edges)));
-}
-
-sf::Vector3f Camera::planeIntersection(const sf::Vector3f &begin, const sf::Vector3f &end, float z) const {
-    auto first = begin;
-    auto second = end;
-
-    auto normal = sf::Vector3f(0, 0, 1);
-    auto ca = sf::Vector3f(1, 1, z) - first;
-    auto vcn = dot(ca, normal);
-    auto cv = second - first;
-    auto vcm = dot(cv, normal);
-    auto k = vcn / vcm;
-
-    auto x = sf::Vector3f(cv.x * k, cv.y * k, cv.z * k);
-    x += first;
-
-    return x;
 }
 
 void Camera::resize(const sf::Vector2u &newSize) {

@@ -51,13 +51,29 @@ Object constructRotationFigure(const std::vector<sf::Vector3f> &points,Camera& c
         }
     }
 
-    std::vector<sf::Vector3f> result1;
-    for (const auto &item: result) {
-        auto vertex = sf::Vector4f(item.x, item.y, item.z, 1);
-        auto worldSpace = vertex * cam.objectToWorldMatrix();
-        result1.emplace_back(worldSpace.x, worldSpace.y, worldSpace.z);
+    result.emplace_back(0, points[0].y, 0);
+    result.emplace_back(0, points[pointCount - 1].y, 0);
+    for (int i = 0; i < steps; ++i) {
+        polygons.emplace_back(std::vector<int> {(int)(result.size() - 2), i * pointCount, ((i + 1) * pointCount) % (steps * pointCount)});
+        polygons.emplace_back(std::vector<int> {(int)(result.size() - 1), i * pointCount + pointCount - 1, ((i + 1) * pointCount + pointCount - 1) % (steps * pointCount)});
     }
 
+    return Object({0, 0, 0}, result, polygons);
+}
 
-    return Object({0, 0, 0}, Object::movedBy(result1, -cam.getPosition()), polygons);
+sf::Vector3f planeIntersection(const sf::Vector3f &begin, const sf::Vector3f &end, float z) {
+    auto first = begin;
+    auto second = end;
+
+    auto normal = sf::Vector3f(0, 0, 1);
+    auto ca = sf::Vector3f(1, 1, z) - first;
+    auto vcn = dot(ca, normal);
+    auto cv = second - first;
+    auto vcm = dot(cv, normal);
+    auto k = vcn / vcm;
+
+    auto x = sf::Vector3f(cv.x * k, cv.y * k, cv.z * k);
+    x += first;
+
+    return x;
 }
