@@ -23,6 +23,7 @@ public:
     std::vector<sf::Vector3f> rotatedAroundX(float angle) override;
     std::vector<sf::Vector3f> rotatedAroundY(float angle) override;
     std::vector<sf::Vector3f> transformed(const Matrix<4> &m) const override;
+    std::vector<sf::Vector3f> screenToMap(const std::vector<sf::Vector2i> &projected) const;
 
 public:
     void render() const;

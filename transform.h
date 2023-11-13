@@ -51,9 +51,11 @@ public:
     Matrix<4> objectToWorldMatrix() const;
 
     Matrix<4> worldToObjectMatrix() const;
+    sf::Vector3f getPosition() const { return position; }
 
 protected:
     sf::Vector3f position;
+    void resetMatrices();
 
 private:
     mutable Matrix<4> objectToWorld;

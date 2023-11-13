@@ -8,6 +8,8 @@
 #include "figures.h"
 #include "gui.h"
 #include "expressionparser.h"
+#include "algorithm.h"
+
 
 
 sf::Color background_color;
@@ -37,6 +39,7 @@ int main() {
                                                  {0, 2},
                                                  {0, 3}}));
     //objects.push_back(&gizmos);
+    std::vector<sf::Vector2i> pointsFig;
     Camera cam({0, 0, -3}, &objects, sf::Vector2u(window_size.x, window_size.y));
     cam.setPixbuf(&pixbuf);
     cam.setProjection(Projection::Perspective);
@@ -53,6 +56,9 @@ int main() {
     auto y2Input = gui.get<tgui::EditBox>("y2");
     auto z2Input = gui.get<tgui::EditBox>("z2");
     auto formulaInput = gui.get<tgui::EditBox>("formula");
+    auto rotatingFigures = gui.get<tgui::Button>("rotFig");
+    auto drawFigures = gui.get<tgui::Button>("draw");
+
 
     auto x0 = -7.f;
     auto x1 = 7.f;
@@ -65,38 +71,75 @@ int main() {
 
 
     formulaInput->onTextChange([=, &cube]() {
-        if(formulaInput->getText().size() == 0) {
+        if (formulaInput->getText().size() == 0) {
             return;
         }
         ExpressionParser parser;
         Expression expr = parser.parse(formulaInput->getText().toStdString());
-        if(!expr.isValid()) {
+        if (!expr.isValid()) {
             return;
         }
         auto ystep = (y1 - y0) / steps;
         auto xstep = (x1 - x0) / steps;
 
         std::vector<sf::Vector3f> points;
-        for(int i = 0; i < steps; ++i) {
+        for (int i = 0; i < steps; ++i) {
             auto y = y0 + ystep * i;
-            for(int j = 0; j < steps; ++j) {
+            for (int j = 0; j < steps; ++j) {
                 auto x = x0 + xstep * j;
-                points.emplace_back(x, -(float)expr.evaluate(x, y), y);
+                points.emplace_back(x, -(float) expr.evaluate(x, y), y);
             }
         }
 
         Polygons polygons;
-        for(int i = 0; i < steps - 1; ++i) {
-            for(int j = 0; j < steps - 1; ++j) {
-                polygons.emplace_back(std::vector<int> {steps * j + i, steps * j + i + 1, steps * (j + 1) + i + 1, steps * (j + 1) + i});
+        for (int i = 0; i < steps - 1; ++i) {
+            for (int j = 0; j < steps - 1; ++j) {
+                polygons.emplace_back(std::vector<int>{steps * j + i, steps * j + i + 1, steps * (j + 1) + i + 1,
+                                                       steps * (j + 1) + i});
             }
         }
 
         cube = Object({0, 0, 0}, points, polygons);
+    });// 0 1 2 3 4 5 6 7
+
+    drawFigures->onClick([=,&cube,&pointsFig,&cam](){
+        if(!pointsFig.empty()) {
+            std::vector<sf::Vector3f> vertices;
+            auto worldSpace = cam.screenToMap(pointsFig);
+            vertices.emplace_back(0, worldSpace[0].y, 0);
+            for (const auto &vertex: worldSpace) {
+                vertices.push_back(vertex);
+            }
+            vertices.emplace_back(0, worldSpace[worldSpace.size() - 1].y, 0);
+            cube = constructRotationFigure(vertices, cam);
+        }
     });
+
 
     auto prev = high_resolution_clock::now();
     auto fps = gui.get<tgui::Label>("fps");
+    canvas->onClick([&]() {
+        if (mode == Mode::FiguresRotate) {
+            pointsFig.push_back(sf::Mouse::getPosition());
+            Edges edges;
+            for (int i = 0; i < pointsFig.size() - 1; ++i) {
+                edges.emplace_back(i, i + 1);
+            }
+
+            std::vector<sf::Vector3f> vertices = cam.screenToMap(pointsFig);
+            cube = Object({0, 0, 0}, vertices, edges);
+        } else {
+            pointsFig.clear();
+        }
+    });
+
+    auto clearButton = gui.get<tgui::Button>("clear");
+    clearButton->onClick([&](){
+        canvas->clear(sf::Color::White);
+        cube = createCube();
+        pointsFig.clear();
+    });
+
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -116,7 +159,7 @@ int main() {
                 case sf::Event::KeyPressed:
                     switch (event.key.code) {
                         case sf::Keyboard::Key::A:
-                            switch(mode) {
+                            switch (mode) {
                                 case Mode::Axis: {
                                     cube.rotateAroundY(-1);
                                     break;
@@ -148,7 +191,7 @@ int main() {
                             }
                             break;
                         case sf::Keyboard::Key::D:
-                            switch(mode) {
+                            switch (mode) {
                                 case Mode::Axis: {
                                     cube.rotateAroundY(1);
                                     break;
@@ -176,7 +219,7 @@ int main() {
                             }
                             break;
                         case sf::Keyboard::Key::W:
-                            switch(mode) {
+                            switch (mode) {
                                 case Mode::Axis: {
                                     cube.rotateAroundX(-1);
                                     break;
@@ -192,7 +235,7 @@ int main() {
                             }
                             break;
                         case sf::Keyboard::Key::S:
-                            switch(mode) {
+                            switch (mode) {
                                 case Mode::Axis: {
                                     cube.rotateAroundX(1);
                                     break;
@@ -212,7 +255,7 @@ int main() {
                             }
                             break;
                         case sf::Keyboard::Key::E:
-                            switch(mode) {
+                            switch (mode) {
                                 case Mode::Axis: {
                                     cube.rotateAroundZ(1);
                                     break;
@@ -228,7 +271,7 @@ int main() {
                             }
                             break;
                         case sf::Keyboard::Key::Q:
-                            switch(mode) {
+                            switch (mode) {
                                 case Mode::Axis: {
                                     cube.rotateAroundZ(-1);
                                     break;
@@ -249,25 +292,25 @@ int main() {
                             break;
                         case sf::Keyboard::Key::Space:
                             switch (mode) {
-                                case Mode::Axis:{
+                                case Mode::Axis: {
                                     cube.rotateAroundX(x1Input->getText().toFloat(0));
                                     cube.rotateAroundY(y1Input->getText().toFloat(0));
                                     cube.rotateAroundZ(z1Input->getText().toFloat(0));
                                     break;
                                 }
-                                case Mode::Center:{
-                                    cube.rotateAroundLine(x1Input->getText().toFloat(0),Axis::X);
-                                    cube.rotateAroundLine(y1Input->getText().toFloat(0),Axis::Y);
-                                    cube.rotateAroundLine(z1Input->getText().toFloat(0),Axis::Z);
+                                case Mode::Center: {
+                                    cube.rotateAroundLine(x1Input->getText().toFloat(0), Axis::X);
+                                    cube.rotateAroundLine(y1Input->getText().toFloat(0), Axis::Y);
+                                    cube.rotateAroundLine(z1Input->getText().toFloat(0), Axis::Z);
                                     break;
                                 }
                             }
                             break;
                     }
                     break;
+
             }
         }
-
         window.clear();
         cam.render();
         texture.update(pixbuf.raw());
@@ -280,5 +323,6 @@ int main() {
         gui.draw();
         window.display();
     }
+
     return 0;
 }

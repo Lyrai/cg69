@@ -12,7 +12,8 @@ enum class Mode{
     Center,
     Scale,
     Move,
-    Mirror
+    Mirror,
+    FiguresRotate
 };
 
 void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode);

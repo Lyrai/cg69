@@ -229,3 +229,9 @@ void Transform::rotateAround(Line *line, float angle) {
 
     moveBy(tmp);
 }
+
+void Transform::resetMatrices() {
+    position = {0, 0, 0};
+    worldToObject = Matrix<4>::identity();
+    objectToWorld = Matrix<4>::identity();
+}

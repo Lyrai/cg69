@@ -21,6 +21,9 @@ public:
     std::vector<sf::Vector3f> scaledAround(const sf::Vector3f& p, float kx, float ky, float kz) const override;
     std::vector<sf::Vector3f> transformed(const Matrix<4>& m) const override;
     static std::vector<sf::Vector3f> transformed(const std::vector<sf::Vector3f>& vertices, const Matrix<4> &m);
+    static std::vector<sf::Vector3f> rotatedAroundY(const std::vector<sf::Vector3f>& vertices, float angle);
+    static std::vector<sf::Vector3f> movedBy(const std::vector<sf::Vector3f>& vertices, sf::Vector3f delta);
+
     static void transform(std::vector<sf::Vector3f>& vertices, const Matrix<4> &m);
 
     sf::Vector3f center() const;

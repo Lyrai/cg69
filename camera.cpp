@@ -31,6 +31,9 @@ void Camera::render() const {
 
 void Camera::draw(const std::vector<sf::Vector2i> &vertices, Object *obj) const {
     for(const auto edge: obj->edges()) {
+        if(edge.first >= vertices.size() || edge.second >= vertices.size()) {
+            std::cout << "Here" << std::endl;
+        }
         draw_line(*pixbuf, vertices[edge.first], vertices[edge.second], sf::Color::Black);
     }
 }
@@ -73,6 +76,18 @@ std::vector<sf::Vector2i> Camera::mapToScreen(const std::vector<sf::Vector2f> &p
     auto ky = screenSize.y / projectionPlaneSize.y;
     for(const auto& vec: projected) {
         result.emplace_back((vec.x + projectionPlaneSize.x / 2) * kx, (vec.y + projectionPlaneSize.y / 2) * ky);
+    }
+
+    return result;
+}
+std::vector<sf::Vector3f> Camera::screenToMap(const std::vector<sf::Vector2i> &projected) const {
+    std::vector<sf::Vector3f> result;
+    auto kx = screenSize.x / projectionPlaneSize.x;
+    auto ky = screenSize.y / projectionPlaneSize.y;
+    for(const auto& vec: projected) {
+        sf::Vector4f temp((vec.x / kx - projectionPlaneSize.x / 2), (vec.y / ky - projectionPlaneSize.y / 2), 0, 0);
+        auto res = temp;
+        result.emplace_back(res.x, res.y, 0);
     }
 
     return result;

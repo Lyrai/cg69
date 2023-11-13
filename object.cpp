@@ -127,11 +127,43 @@ void Object::transform(std::vector<sf::Vector3f> &vertices, const Matrix<4> &m) 
         vertices[i] = sf::Vector3f(v4.x / v4.w, v4.y / v4.w, v4.z / v4.w);
     }
 }
+std::vector<sf::Vector3f> Object::rotatedAroundY(const std::vector<sf::Vector3f> &vertices, float angle){
+    std::vector<sf::Vector3f> result;
+    result.reserve(vertices.size());
+
+    float sina = sin(angle * M_PI / 180);
+    float cosa = cos(angle * M_PI / 180);
+    Matrix<4> m = Matrix<4>::identity();
+    m(0, 0) = cosa;
+    m(0, 2) = sina;
+    m(2, 0) = -sina;
+    m(2, 2) = cosa;
+
+    for(auto vertex : vertices) {
+        auto tmp = sf::Vector4f(vertex.x, vertex.y, vertex.z, 1);
+        auto v4 = tmp * m;
+        result.emplace_back(v4.x / v4.w, v4.y / v4.w, v4.z / v4.w);
+    }
+
+    return result;
+}
 
 Object &Object::operator=(Object &&other) {
+    resetMatrices();
     _vertices = std::move(other._vertices);
     _edges = std::move(other._edges);
     _polygons = std::move(other._polygons);
     moveBy(other.position);
     return *this;
+}
+
+std::vector<sf::Vector3f> Object::movedBy(const std::vector<sf::Vector3f>& vertices, sf::Vector3f delta) {
+    std::vector<sf::Vector3f> result;
+    result.reserve(vertices.size());
+
+    for (const auto &point: vertices) {
+        result.push_back(point + delta);
+    }
+
+    return result;
 }

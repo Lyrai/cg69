@@ -14,6 +14,7 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     auto layoutRotation = tgui::HorizontalLayout::create({"100%", "5%"});
     auto layoutInput = tgui::HorizontalLayout::create({"40%", "3%"});
     auto layoutGraphInput = tgui::Group::create({"40%", "3%"});
+    auto layoutRotationFigure = tgui::HorizontalLayout::create({"100%", "5%"});
     auto fps = tgui::Label::create();
     fps->setTextSize(20);
     fps->setPosition("95%", "7%");
@@ -26,6 +27,7 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     layoutRotation->setVisible(false);
     layoutInput->setVisible(false);
     layoutGraphInput->setVisible(false);
+    layoutRotationFigure->setVisible(false);
 
     gui.add(layoutMain);
     gui.add(layoutProjection);
@@ -34,6 +36,7 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     gui.add(layoutRotation);
     gui.add(layoutInput);
     gui.add(layoutGraphInput);
+    gui.add((layoutRotationFigure));
     gui.add(fps);
 
     //Main
@@ -45,18 +48,22 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     figuresButton->setTextSize(20);
     auto graphButton = tgui::Button::create("Graph");
     graphButton->setTextSize(20);
+    auto rotatingFigButton = tgui::Button::create("Rotation Figures");
+    rotatingFigButton->setTextSize(20);
+    rotatingFigButton->setWidgetName("rotFig");
 
     layoutMain->add(projectionButton);
     layoutMain->add(transformationButton);
     layoutMain->add(figuresButton);
     layoutMain->add(graphButton);
+    layoutMain->add(rotatingFigButton);
 
     layoutMain->insertSpace(0, 0.025);
     layoutMain->insertSpace(2, 0.025);
     layoutMain->insertSpace(4, 0.025);
     layoutMain->insertSpace(6, 0.025);
     layoutMain->insertSpace(8, 0.025);
-
+    layoutMain->insertSpace(10, 0.025);
 
     //Projection
     auto parallelButton = tgui::Button::create("Parallel");
@@ -244,6 +251,29 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     layoutGraphInput->add(graphLabelZ);
     layoutGraphInput->add(graphInputFormula);
 
+    auto drawButton = tgui::Button::create("Draw");
+    auto clearButton = tgui::Button::create("Clear");
+    auto back4Button = tgui::Button::create("Back");
+    auto addPointsButton = tgui::Button::create("Add points");
+    drawButton->setWidgetName("draw");
+    clearButton->setWidgetName("clear");
+    drawButton->setTextSize(20);
+    addPointsButton->setTextSize(20);
+    clearButton->setTextSize(20);
+    back4Button->setTextSize(20);
+
+
+    layoutRotationFigure->addSpace(0.05);
+    layoutRotationFigure->add(addPointsButton);
+    layoutRotationFigure->addSpace(0.05);
+    layoutRotationFigure->add(drawButton);
+    layoutRotationFigure->addSpace(0.05);
+    layoutRotationFigure->add(clearButton);
+    layoutRotationFigure->addSpace(0.05);
+    layoutRotationFigure->add(back4Button);
+    layoutRotationFigure->addSpace(0.05);
+
+
 
     parallelButton->onClick([&cam]() { cam.setProjection(Projection::Parallel); });
     perspectiveButton->onClick([&cam]() { cam.setProjection(Projection::Perspective); });
@@ -347,4 +377,17 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     scaleButton->onClick([=,&mode](){
         mode = Mode::Scale;
     });
+    rotatingFigButton->onClick([=](){
+        layoutMain->setVisible(false);
+        layoutRotationFigure->setVisible(true);
+    });
+    back4Button->onClick([=,&mode](){
+       layoutRotationFigure->setVisible(false);
+       layoutMain->setVisible(true);
+    });
+    addPointsButton->onClick([&mode](){
+        mode = Mode::FiguresRotate;
+    });
+
+
 }
