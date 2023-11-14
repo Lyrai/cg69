@@ -64,14 +64,22 @@ int main() {
     auto x1 = 7.f;
     auto y0 = -7.f;
     auto y1 = 7.f;
-    auto steps = 1000;
+    auto steps = 100;
 
-    //5 * (cos(x^2 + y^2 + 1) / (x^2 + y^2 + 1) + 0.1)
-    //cos(x^2 + y^2) / (x^2 + y^2 + 1)
+    auto graphX0 = gui.get<tgui::EditBox>("graphX0");
+    auto graphX1 = gui.get<tgui::EditBox>("graphX1");
+    auto graphY0 = gui.get<tgui::EditBox>("graphY0");
+    auto graphY1 = gui.get<tgui::EditBox>("graphY1");
+    auto graphSteps = gui.get<tgui::EditBox>("graphSteps");
 
+    graphX0->setText(tgui::String(x0));
+    graphX1->setText(tgui::String(x1));
+    graphY0->setText(tgui::String(y0));
+    graphY1->setText(tgui::String(y1));
+    graphSteps->setText(tgui::String(steps));
 
-    formulaInput->onTextChange([=, &cube]() {
-        if (formulaInput->getText().size() == 0) {
+    auto drawGraph = [&]() {
+        if (formulaInput->getText().empty()) {
             return;
         }
         ExpressionParser parser;
@@ -100,7 +108,19 @@ int main() {
         }
 
         cube = Object({0, 0, 0}, points, polygons);
-    });// 0 1 2 3 4 5 6 7
+    };
+
+    graphX0->onTextChange([&]() { x0 = graphX0->getText().toFloat(); drawGraph(); });
+    graphX1->onTextChange([&]() { x1 = graphX1->getText().toFloat(); drawGraph(); });
+    graphY0->onTextChange([&]() { y0 = graphY0->getText().toFloat(); drawGraph(); });
+    graphY1->onTextChange([&]() { y1 = graphY1->getText().toFloat(); drawGraph(); });
+    graphSteps->onTextChange([&]() { steps = graphSteps->getText().toInt(); drawGraph(); });
+
+    //5 * (cos(x^2 + y^2 + 1) / (x^2 + y^2 + 1) + 0.1)
+    //cos(x^2 + y^2) / (x^2 + y^2 + 1)
+
+
+    formulaInput->onTextChange(drawGraph);// 0 1 2 3 4 5 6 7
 
     drawFigures->onClick([=,&cube,&pointsFig,&cam](){
         if(!pointsFig.empty()) {

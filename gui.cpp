@@ -13,7 +13,7 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     auto layoutFigures = tgui::HorizontalLayout::create({"100%", "5%"});
     auto layoutRotation = tgui::HorizontalLayout::create({"100%", "5%"});
     auto layoutInput = tgui::HorizontalLayout::create({"40%", "3%"});
-    auto layoutGraphInput = tgui::Group::create({"40%", "3%"});
+    auto layoutGraphInput = tgui::Group::create({"100%", "6%"});
     auto layoutRotationFigure = tgui::HorizontalLayout::create({"100%", "5%"});
     auto fps = tgui::Label::create();
     fps->setTextSize(20);
@@ -239,14 +239,76 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
 
     auto graphLabelZ = tgui::Label::create("z = ");
     auto graphInputFormula = tgui::EditBox::create();
+    auto graphParamsLayout = tgui::HorizontalLayout::create();
+    auto graphX0 = tgui::EditBox::create();
+    auto graphX1 = tgui::EditBox::create();
+    auto graphY0 = tgui::EditBox::create();
+    auto graphY1 = tgui::EditBox::create();
+    auto graphSteps = tgui::EditBox::create();
+
+    graphX0->setWidgetName("graphX0");
+    graphX0->setTextSize(16);
+    graphX1->setWidgetName("graphX1");
+    graphX1->setTextSize(16);
+    graphY0->setWidgetName("graphY0");
+    graphY0->setTextSize(16);
+    graphY1->setWidgetName("graphY1");
+    graphY1->setTextSize(16);
+    graphSteps->setWidgetName("graphSteps");
+    graphSteps->setTextSize(16);
+
+    auto graphX0Text = tgui::Label::create("x0 = ");
+    auto graphX1Text = tgui::Label::create("x1 = ");
+    auto graphY0Text = tgui::Label::create("y0 = ");
+    auto graphY1Text = tgui::Label::create("y1 = ");
+    auto graphStepsText = tgui::Label::create("steps = ");
+
+    graphX0Text->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Right);
+    graphX0Text->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+    graphX1Text->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Right);
+    graphX1Text->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+    graphY0Text->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Right);
+    graphY0Text->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+    graphY1Text->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Right);
+    graphY1Text->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+    graphStepsText->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Right);
+    graphStepsText->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+
+    graphX0Text->setTextSize(20);
+    graphX0Text->setScrollbarPolicy(tgui::Scrollbar::Policy::Never);
+    graphX1Text->setTextSize(20);
+    graphX1Text->setScrollbarPolicy(tgui::Scrollbar::Policy::Never);
+    graphY0Text->setTextSize(20);
+    graphY0Text->setScrollbarPolicy(tgui::Scrollbar::Policy::Never);
+    graphY1Text->setTextSize(20);
+    graphY1Text->setScrollbarPolicy(tgui::Scrollbar::Policy::Never);
+    graphStepsText->setTextSize(20);
+    graphStepsText->setScrollbarPolicy(tgui::Scrollbar::Policy::Never);
+
+    graphParamsLayout->add(graphX0Text);
+    graphParamsLayout->add(graphX0);
+    graphParamsLayout->add(graphX1Text);
+    graphParamsLayout->add(graphX1);
+    graphParamsLayout->add(graphY0Text);
+    graphParamsLayout->add(graphY0);
+    graphParamsLayout->add(graphY1Text);
+    graphParamsLayout->add(graphY1);
+    graphParamsLayout->add(graphStepsText);
+    graphParamsLayout->add(graphSteps);
+
+
+    layoutGraphInput->add(graphParamsLayout);
 
     graphInputFormula->setWidgetName("formula");
     graphLabelZ->setTextSize(20);
     graphInputFormula->setTextSize(16);
     graphInputFormula->setPosition(graphLabelZ->getSize().x + 8, graphLabelZ->getPosition().y);
-    graphInputFormula->setSize({"80%", "80%"});
+    graphInputFormula->setSize({"25%", graphLabelZ->getSize().y});
 
     graphLabelZ->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+
+    graphParamsLayout->setPosition({"-4%", graphLabelZ->getSize().y + 8});
+    graphParamsLayout->setSize({"92%", graphLabelZ->getSize().y});
 
     layoutGraphInput->add(graphLabelZ);
     layoutGraphInput->add(graphInputFormula);
