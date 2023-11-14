@@ -34,17 +34,17 @@ namespace ns {
     using json = nlohmann::json;
     struct raw_data {
         std::vector<std::vector<std::string>> _vertices;
-        std::vector<std::pair<std::string, std::string>> _edges;
+        std::vector<std::vector<std::string>> _polygons;
     };
 
     void to_json(json &j, const raw_data &rd) {
         j = json{{"vertices", rd._vertices},
-                 {"edges",    rd._edges}};
+                 {"polygons", rd._polygons}};
     }
 
     void from_json(const json &j, raw_data &rd) {
         j.at("vertices").get_to(rd._vertices);
-        j.at("edges").get_to(rd._edges);
+        j.at("polygons").get_to(rd._polygons);
     }
 }
 
@@ -62,6 +62,18 @@ std::vector<std::pair<int, int>> parseEdges(const std::vector<std::pair<std::str
     for (const auto &edge_raw: raw_edges) {
         std::pair<int, int> edge(std::stoi(edge_raw.first), std::stoi(edge_raw.second));
         rval.emplace_back(edge);
+    }
+    return rval;
+}
+
+Polygons parsePolygons(const std::vector<std::vector<std::string>> &raw_polygons) {
+    auto rval = Polygons();
+    for (const auto &poly_raw: raw_polygons) {
+        std::vector<int> polygon {};
+        for (const auto &poly_val: poly_raw) {
+            polygon.emplace_back(std::stoi(poly_val));
+        }
+        rval.emplace_back(polygon);
     }
     return rval;
 }
@@ -161,7 +173,7 @@ Object createTetrahedron() {
 
 Object createIcosahedron() {
     float phi = 1.6180;
-    float coef = sqrt(1 + 1.6180 * 1.6180);
+    float coef = sqrt(1 + phi * phi);
     std::vector<sf::Vector3f> icosahedronVertices{
             {phi / coef,   1.0f / coef,  0},
             {phi / coef,   -1.0f / coef, 0},
@@ -239,7 +251,7 @@ Object createIcosahedron() {
 
 Object createShelestStar() {
     float coef = sqrt(1 + 1.6180 * 1.6180);
-    float phi = 1.6180 * coef;
+    float phi = 1.6180f * coef;
     std::vector<sf::Vector3f> dodecahedronVertices{
             {1.f / coef,  1.f / coef,  1.f / coef},//0
             {1.f / coef,  1.f / coef,  -1.f / coef},//1
@@ -319,7 +331,7 @@ Object createShelestStar() {
 
 Object createDodecahedron() {
     float phi = 1.6180;
-    float coef = sqrt(1 + 1.6180 * 1.6180);
+    float coef = sqrt(1 + phi * phi);
     std::vector<sf::Vector3f> dodecahedronVertices{
             {1,        1,        1},//0
             {1,        1,        -1},//1
@@ -401,8 +413,9 @@ Object parseFigure(const std::string &path) {
     std::ifstream f(path);
     json data = json::parse(f);
     auto st = data.get<ns::raw_data>();
-    std::vector<sf::Vector3f> Vertices = parseVertices(st._vertices);
-    std::vector<std::pair<int, int>> Edges = parseEdges(st._edges);
-    Object cube({0, 0, 0}, Vertices, Edges);
-    return cube;
+    std::vector<sf::Vector3f> vertices = parseVertices(st._vertices);
+//    std::vector<std::pair<int, int>> Edges = parseEdges(st._edges);
+    Polygons polygons = parsePolygons(st._polygons);
+    Object figure({0, 0, 0}, vertices, polygons);
+    return figure;
 }

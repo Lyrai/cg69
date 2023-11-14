@@ -29,8 +29,8 @@ int main() {
     std::vector<Object *> objects;
 
 //    Object cube = createIcosahedron();
-//    Object cube = parseFigure("figures/octahedron.json");
-    Object cube = createCube();
+    Object cube = parseFigure("figures/tetrahedron_poly.json");
+//    Object cube = createCube();
     objects.push_back(&cube);
     Object gizmos({0, 0, 0}, {{0, 0, 0},
                               {1, 0, 0},

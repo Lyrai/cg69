@@ -21,4 +21,4 @@ add_executable(cg6 main.cpp pixbuf.cpp pixel.cpp polygon.cpp line.cpp
         gui.h
         expressionparser.cpp
         expressionparser.h)
-target_link_libraries(cg6 sfml-graphics sfml-window sfml-system tgui)
+target_link_libraries(cg6 sfml-graphics sfml-window sfml-system tgui nlohmann_json::nlohmann_json)
