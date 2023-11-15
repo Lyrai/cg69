@@ -30,6 +30,7 @@ public:
 
     const std::vector<std::pair<int, int>>& edges() const { return _edges; }
     const std::vector<sf::Vector3f>& vertices() const { return _vertices; }
+    const Polygons& polygons() const { return _polygons; }
 
     Object& operator=(Object&& other);
 

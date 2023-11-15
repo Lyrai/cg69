@@ -15,6 +15,7 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     auto layoutInput = tgui::HorizontalLayout::create({"40%", "3%"});
     auto layoutGraphInput = tgui::Group::create({"100%", "6%"});
     auto layoutRotationFigure = tgui::HorizontalLayout::create({"100%", "5%"});
+    auto layoutLoadSave = tgui::HorizontalLayout::create({"100%", "5%"});
     auto fps = tgui::Label::create();
     fps->setTextSize(20);
     fps->setPosition("95%", "7%");
@@ -28,6 +29,7 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     layoutInput->setVisible(false);
     layoutGraphInput->setVisible(false);
     layoutRotationFigure->setVisible(false);
+    layoutLoadSave->setVisible(false);
 
     gui.add(layoutMain);
     gui.add(layoutProjection);
@@ -37,6 +39,7 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     gui.add(layoutInput);
     gui.add(layoutGraphInput);
     gui.add((layoutRotationFigure));
+    gui.add(layoutLoadSave);
     gui.add(fps);
 
     //Main
@@ -51,12 +54,15 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     auto rotatingFigButton = tgui::Button::create("Rotation Figures");
     rotatingFigButton->setTextSize(20);
     rotatingFigButton->setWidgetName("rotFig");
+    auto loadSaveButton = tgui::Button::create("Load/Save");
+    loadSaveButton->setTextSize(20);
 
     layoutMain->add(projectionButton);
     layoutMain->add(transformationButton);
     layoutMain->add(figuresButton);
     layoutMain->add(graphButton);
     layoutMain->add(rotatingFigButton);
+    layoutMain->add(loadSaveButton);
 
     layoutMain->insertSpace(0, 0.025);
     layoutMain->insertSpace(2, 0.025);
@@ -64,6 +70,7 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     layoutMain->insertSpace(6, 0.025);
     layoutMain->insertSpace(8, 0.025);
     layoutMain->insertSpace(10, 0.025);
+    layoutMain->insertSpace(12, 0.025);
 
     //Projection
     auto parallelButton = tgui::Button::create("Parallel");
@@ -336,6 +343,24 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     layoutRotationFigure->addSpace(0.05);
 
 
+    auto loadButton = tgui::Button::create("Load");
+    auto saveButton = tgui::Button::create("Save");
+    auto loadSaveBackButton = tgui::Button::create("Back");
+
+    loadButton->setWidgetName("load");
+    saveButton->setWidgetName("save");
+
+    loadButton->setTextSize(20);
+    saveButton->setTextSize(20);
+    loadSaveBackButton->setTextSize(20);
+
+    layoutLoadSave->addSpace(0.05);
+    layoutLoadSave->add(loadButton);
+    layoutLoadSave->addSpace(0.05);
+    layoutLoadSave->add(saveButton);
+    layoutLoadSave->addSpace(0.05);
+    layoutLoadSave->add(loadSaveBackButton);
+    layoutLoadSave->addSpace(0.05);
 
     parallelButton->onClick([&cam]() { cam.setProjection(Projection::Parallel); });
     perspectiveButton->onClick([&cam]() { cam.setProjection(Projection::Perspective); });
@@ -373,6 +398,10 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
         layoutRotation->setVisible(false);
         layoutTransformation->setVisible(true);
         layoutInput->setVisible(false);
+    });
+    loadSaveBackButton->onClick([=]() {
+        layoutLoadSave->setVisible(false);
+        layoutMain->setVisible(true);
     });
     cubeButton->onClick([&cube](){
         cube = createCube();
@@ -450,6 +479,9 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     addPointsButton->onClick([&mode](){
         mode = Mode::FiguresRotate;
     });
-
-
+    loadSaveButton->onClick([=]() {
+        layoutMain->setVisible(false);
+        layoutLoadSave->setVisible(true);
+        layoutGraphInput->setVisible(false);
+    });
 }
