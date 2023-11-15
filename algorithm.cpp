@@ -1,4 +1,5 @@
 #include "algorithm.h"
+#include "gui.h"
 
 void draw_line(Pixbuf& pixbuf, sf::Vector2i begin, sf::Vector2i end, const sf::Color& border_color) {
     auto d = end - begin;
@@ -29,9 +30,8 @@ void draw_line(Pixbuf& pixbuf, sf::Vector2i begin, sf::Vector2i end, const sf::C
     }
 }
 
-Object constructRotationFigure(const std::vector<sf::Vector3f> &points,Camera& cam)
+Object constructRotationFigure(const std::vector<sf::Vector3f> &points,Camera& cam,int steps)
 {
-    int steps = 10;
     float count = 360.f / steps;
     std::vector<sf::Vector3f> result;
     result.reserve(points.size() * steps);

@@ -16,12 +16,14 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     auto layoutGraphInput = tgui::Group::create({"100%", "6%"});
     auto layoutRotationFigure = tgui::HorizontalLayout::create({"100%", "5%"});
     auto layoutLoadSave = tgui::HorizontalLayout::create({"100%", "5%"});
+    auto layoutRotFigInput = tgui::HorizontalLayout::create({"20%", "3%"});
     auto fps = tgui::Label::create();
     fps->setTextSize(20);
     fps->setPosition("95%", "7%");
     fps->setWidgetName("fps");
     layoutInput->setPosition("0%","7%");
     layoutGraphInput->setPosition("0%","7%");
+    layoutRotFigInput->setPosition("0%","7%");
     layoutProjection->setVisible(false);
     layoutTransformation->setVisible(false);
     layoutFigures->setVisible(false);
@@ -30,6 +32,7 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     layoutGraphInput->setVisible(false);
     layoutRotationFigure->setVisible(false);
     layoutLoadSave->setVisible(false);
+    layoutRotFigInput->setVisible(false);
 
     gui.add(layoutMain);
     gui.add(layoutProjection);
@@ -41,6 +44,7 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     gui.add((layoutRotationFigure));
     gui.add(layoutLoadSave);
     gui.add(fps);
+    gui.add(layoutRotFigInput);
 
     //Main
     auto projectionButton = tgui::Button::create("Projections");
@@ -342,6 +346,15 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     layoutRotationFigure->add(back4Button);
     layoutRotationFigure->addSpace(0.05);
 
+    auto stepInputRotation = tgui::EditBox::create();
+    auto stepLabel = tgui::Label::create("steps = ");
+    stepInputRotation->setWidgetName("stepsRot");
+    stepLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+    stepLabel->setTextSize(20);
+    layoutRotFigInput->add(stepLabel);
+    layoutRotFigInput->add(stepInputRotation);
+
+
 
     auto loadButton = tgui::Button::create("Load");
     auto saveButton = tgui::Button::create("Save");
@@ -471,10 +484,12 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     rotatingFigButton->onClick([=](){
         layoutMain->setVisible(false);
         layoutRotationFigure->setVisible(true);
+        layoutRotFigInput->setVisible(true);
     });
     back4Button->onClick([=,&mode](){
        layoutRotationFigure->setVisible(false);
        layoutMain->setVisible(true);
+       layoutRotFigInput->setVisible(false);
     });
     addPointsButton->onClick([&mode](){
         mode = Mode::FiguresRotate;
