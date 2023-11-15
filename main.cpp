@@ -71,6 +71,9 @@ int main() {
     auto graphY0 = gui.get<tgui::EditBox>("graphY0");
     auto graphY1 = gui.get<tgui::EditBox>("graphY1");
     auto graphSteps = gui.get<tgui::EditBox>("graphSteps");
+    auto rotSteps = gui.get<tgui::EditBox>("stepsRot");
+
+
 
     graphX0->setText(tgui::String(x0));
     graphX1->setText(tgui::String(x1));
@@ -131,7 +134,20 @@ int main() {
                 vertices.push_back(vertex);
             }
             //vertices.emplace_back(0, worldSpace[worldSpace.size() - 1].y, 0);
-            cube = constructRotationFigure(vertices, cam);
+            cube = constructRotationFigure(vertices, cam,rotSteps->getText().toInt());
+        }
+    });
+
+    rotSteps->onTextChange([=,&cube,&pointsFig,&cam](){
+        if(!pointsFig.empty()) {
+            std::vector<sf::Vector3f> vertices;
+            auto worldSpace = cam.screenToMap(pointsFig);
+            //vertices.emplace_back(0, worldSpace[0].y, 0);
+            for (const auto &vertex: worldSpace) {
+                vertices.push_back(vertex);
+            }
+            //vertices.emplace_back(0, worldSpace[worldSpace.size() - 1].y, 0);
+            cube = constructRotationFigure(vertices, cam,rotSteps->getText().toInt());
         }
     });
 
