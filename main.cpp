@@ -22,6 +22,7 @@ int main() {
     auto window_size = window.getSize();
     tgui::Gui gui(window);
     Mode mode;
+    Axis axis;
 
     texture.create(window_size.x, window_size.y);
 
@@ -72,6 +73,7 @@ int main() {
     auto graphY1 = gui.get<tgui::EditBox>("graphY1");
     auto graphSteps = gui.get<tgui::EditBox>("graphSteps");
     auto rotSteps = gui.get<tgui::EditBox>("stepsRot");
+    auto rotAxis = gui.get<tgui::EditBox>("axisRot");
 
 
 
@@ -155,7 +157,7 @@ int main() {
 
     formulaInput->onTextChange(drawGraph);// 0 1 2 3 4 5 6 7
 
-    drawFigures->onClick([=,&cube,&pointsFig,&cam](){
+    drawFigures->onClick([=,&cube,&pointsFig,&cam,&axis](){
         if(!pointsFig.empty()) {
             std::vector<sf::Vector3f> vertices;
             auto worldSpace = cam.screenToMap(pointsFig);
@@ -164,11 +166,11 @@ int main() {
                 vertices.push_back(vertex);
             }
             //vertices.emplace_back(0, worldSpace[worldSpace.size() - 1].y, 0);
-            cube = constructRotationFigure(vertices, cam,rotSteps->getText().toInt());
+            cube = constructRotationFigure(vertices, cam,rotSteps->getText().toInt(),axis);
         }
     });
 
-    rotSteps->onTextChange([=,&cube,&pointsFig,&cam](){
+    rotSteps->onTextChange([=,&cube,&pointsFig,&cam,&axis](){
         if(!pointsFig.empty()) {
             std::vector<sf::Vector3f> vertices;
             auto worldSpace = cam.screenToMap(pointsFig);
@@ -176,9 +178,28 @@ int main() {
             for (const auto &vertex: worldSpace) {
                 vertices.push_back(vertex);
             }
-            //vertices.emplace_back(0, worldSpace[worldSpace.size() - 1].y, 0);
-            cube = constructRotationFigure(vertices, cam,rotSteps->getText().toInt());
         }
+    });
+
+    rotAxis->onTextChange([=,&axis](){
+            switch (rotAxis->getText()[0]) {
+                case 'x':
+                {
+                    axis = Axis::X;
+                    break;
+                }
+                case 'y':
+                {
+                    axis = Axis::Y;
+                    break;
+                }case 'z':
+                {
+                    axis = Axis::Z;
+                    break;
+                }
+
+            }
+
     });
 
 

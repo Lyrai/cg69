@@ -147,6 +147,48 @@ std::vector<sf::Vector3f> Object::rotatedAroundY(const std::vector<sf::Vector3f>
 
     return result;
 }
+std::vector<sf::Vector3f> Object::rotatedAroundX(const std::vector<sf::Vector3f>& vertices, float angle){
+    std::vector<sf::Vector3f> result;
+    result.reserve(vertices.size());
+
+    float sina = sin(angle * M_PI / 180);
+    float cosa = cos(angle * M_PI / 180);
+    Matrix<4> m = Matrix<4>::identity();
+    m(1, 1) = cosa;
+    m(1, 2) = sina;
+    m(2, 1) = -sina;
+    m(2, 2) = cosa;
+
+    for(int i = 0; i < vertices.size(); ++i) {
+        auto tmp = sf::Vector4f(vertices[i].x, vertices[i].y, vertices[i].z, 1);
+        auto v4 = tmp * m;
+        result.emplace_back(v4.x / v4.w, v4.y / v4.w, v4.z / v4.w);
+    }
+
+    return result;
+}
+
+std::vector<sf::Vector3f> Object::rotatedAroundZ(const std::vector<sf::Vector3f>& vertices, float angle)
+{
+    std::vector<sf::Vector3f> result;
+    result.reserve(vertices.size());
+
+    float sina = sin(angle * M_PI / 180);
+    float cosa = cos(angle * M_PI / 180);
+    Matrix<4> m = Matrix<4>::identity();
+    m(0, 0) = cosa;
+    m(0, 1) = sina;
+    m(1, 0) = -sina;
+    m(1, 1) = cosa;
+
+    for(int i = 0; i < vertices.size(); ++i) {
+        auto tmp = sf::Vector4f(vertices[i].x, vertices[i].y, vertices[i].z, 1);
+        auto v4 = tmp * m;
+        result.emplace_back(v4.x / v4.w, v4.y / v4.w, v4.z / v4.w);
+    }
+
+    return result;
+}
 
 Object &Object::operator=(Object &&other) {
     resetMatrices();

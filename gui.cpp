@@ -348,11 +348,19 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
 
     auto stepInputRotation = tgui::EditBox::create();
     auto stepLabel = tgui::Label::create("steps = ");
+    auto axisLabel = tgui::Label::create("Axis = ");
+    auto axisInput = tgui::EditBox::create();
     stepInputRotation->setWidgetName("stepsRot");
+    axisInput->setWidgetName("axisRot");
     stepLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+    axisLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
     stepLabel->setTextSize(20);
+    axisLabel->setTextSize(20);
     layoutRotFigInput->add(stepLabel);
     layoutRotFigInput->add(stepInputRotation);
+    layoutRotFigInput->addSpace(0.05);
+    layoutRotFigInput->add(axisLabel);
+    layoutRotFigInput->add(axisInput);
 
 
 
