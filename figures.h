@@ -24,4 +24,5 @@ std::vector<sf::Vector3f> parseVertices(const std::vector<std::vector<std::strin
 std::vector<std::pair<int, int>> parseEdges(const std::vector<std::pair<std::string, std::string>> &raw_edges);
 
 Polygons parsePolygons(const std::vector<std::vector<std::string>> &raw_polygons);
+void saveFigure(const Object& obj, const std::string& path);
 #endif //CG6_FIGURES_H

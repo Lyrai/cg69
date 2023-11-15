@@ -118,6 +118,36 @@ int main() {
     graphY0->onTextChange([&]() { y0 = graphY0->getText().toFloat(); drawGraph(); });
     graphY1->onTextChange([&]() { y1 = graphY1->getText().toFloat(); drawGraph(); });
     graphSteps->onTextChange([&]() { steps = graphSteps->getText().toInt(); drawGraph(); });
+    /*auto fileDialog = tgui::FileDialog::create();
+    gui.add(fileDialog);
+    fileDialog->setPath("figures/");
+    auto filename = fileDialog->getFilename();
+    fileDialog->setFileMustExist(false);
+    fileDialog->onFileSelect([&]() {
+        cube = parseFigure(fileDialog->getSelectedPaths()[0].asNativeString());
+    });*/
+
+    auto loadButton = gui.get<tgui::Button>("load");
+    auto saveButton = gui.get<tgui::Button>("save");
+
+    loadButton->onClick([&]() {
+        auto fileDialog = tgui::FileDialog::create();
+        gui.add(fileDialog);
+        fileDialog->setPath("figures/");
+        fileDialog->onFileSelect([=, &cube]() {
+            cube = parseFigure(fileDialog->getSelectedPaths()[0].asNativeString());
+        });
+    });
+
+    saveButton->onClick([&]() {
+        auto fileDialog = tgui::FileDialog::create();
+        gui.add(fileDialog);
+        fileDialog->setFileMustExist(false);
+        fileDialog->setPath("figures/");
+        fileDialog->onFileSelect([=, &cube]() {
+            saveFigure(cube, fileDialog->getSelectedPaths()[0].asNativeString());
+        });
+    });
 
     //5 * (cos(x^2 + y^2 + 1) / (x^2 + y^2 + 1) + 0.1)
     //cos(x^2 + y^2) / (x^2 + y^2 + 1)

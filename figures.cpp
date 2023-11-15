@@ -37,8 +37,22 @@ namespace ns {
         std::vector<std::vector<std::string>> _polygons;
     };
 
-    void to_json(json &j, const raw_data &rd) {
-        j = json{{"vertices", rd._vertices},
+    json to_json(const Object& obj) {
+        raw_data rd;
+        for (const auto &vertex: obj.vertices()) {
+            rd._vertices.emplace_back(std::vector<std::string> {std::to_string(vertex.x), std::to_string(vertex.y), std::to_string(vertex.z)});
+        }
+
+        for (const auto &polygon: obj.polygons()) {
+            std::vector<std::string> p;
+            for (const auto idx: polygon) {
+                p.push_back(std::to_string(idx));
+            }
+
+            rd._polygons.emplace_back(std::move(p));
+        }
+
+        return json{{"vertices", rd._vertices},
                  {"polygons", rd._polygons}};
     }
 
@@ -418,4 +432,9 @@ Object parseFigure(const std::string &path) {
     Polygons polygons = parsePolygons(st._polygons);
     Object figure({0, 0, 0}, vertices, polygons);
     return figure;
+}
+
+void saveFigure(const Object& obj, const std::string& path) {
+    std::ofstream file(path);
+    file << to_string(ns::to_json(obj));
 }
