@@ -235,3 +235,16 @@ void Transform::resetMatrices() {
     worldToObject = Matrix<4>::identity();
     objectToWorld = Matrix<4>::identity();
 }
+
+
+sf::Vector3f Transform::toWorldCoordinates(const sf::Vector3f &vec) const {
+    auto tmp = sf::Vector4f(vec.x, vec.y, vec.z, 1);
+    auto v4 = tmp * worldToObjectMatrix();
+    return { v4.x / v4.w, v4.y / v4.w, v4.z / v4.w };
+}
+
+sf::Vector3f Transform::toObjectCoordinates(const sf::Vector3f &vec) const {
+    auto tmp = sf::Vector4f(vec.x, vec.y, vec.z, 1);
+    auto v4 = tmp * objectToWorldMatrix();
+    return { v4.x / v4.w, v4.y / v4.w, v4.z / v4.w };
+}

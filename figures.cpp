@@ -1,8 +1,9 @@
-#include "figures.h"
-#include "cmath"
+#include <cmath>
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include <regex>
+#include "figures.h"
+#include "indexpolygon.h"
 
 using json = nlohmann::json;
 
@@ -45,7 +46,7 @@ namespace ns {
 
         for (const auto &polygon: obj.polygons()) {
             std::vector<std::string> p;
-            for (const auto idx: polygon) {
+            for (const auto idx: polygon.indices()) {
                 p.push_back(std::to_string(idx));
             }
 
@@ -105,12 +106,12 @@ Object createCube() {
     };
 
     Polygons cubePolygons {
-            {4, 5, 6, 7},
-            {0, 1, 2, 3},
-            {0, 1, 5, 4},
-            {0, 3, 7, 4},
-            {1, 2, 6, 5},
-            {3, 2, 6, 7}
+            {{4, 5, 6, 7}},
+            {{0, 1, 2, 3}},
+            {{0, 1, 5, 4}},
+            {{0, 3, 7, 4}},
+            {{1, 2, 6, 5}},
+            {{3, 2, 6, 7}}
     };
 
     Object cube({0, 0, 0}, cubeVertices, cubePolygons);
@@ -143,14 +144,14 @@ Object createOctahedron() {
     };*/
 
     Polygons octahedronPolygons {
-            {0, 1, 2},
-            {0, 1, 4},
-            {0, 2, 3},
-            {0, 3, 4},
-            {1, 2, 5},
-            {1, 4, 5},
-            {2, 3, 5},
-            {3, 4, 5}
+            {{0, 1, 2}},
+            {{0, 1, 4}},
+            {{0, 2, 3}},
+            {{0, 3, 4}},
+            {{1, 2, 5}},
+            {{1, 4, 5}},
+            {{2, 3, 5}},
+            {{3, 4, 5}}
     };
 
     Object octahedron({0, 0, 0}, octahedronVertices, octahedronPolygons);
@@ -175,10 +176,10 @@ Object createTetrahedron() {
     };
 
     Polygons tetrahedronPolygons {
-            {0, 1, 2},
-            {0, 1, 3},
-            {0, 2, 3},
-            {1, 2, 3}
+            {{0, 1, 2}},
+            {{0, 1, 3}},
+            {{0, 2, 3}},
+            {{1, 2, 3}}
     };
 
     Object tetrahedron({0, 0, 0}, tetrahedronVertices, tetrahedronPolygons);
@@ -237,26 +238,26 @@ Object createIcosahedron() {
     };
 
     Polygons icosahedronPolygons {
-            {0, 1, 8},
-            {0, 1, 9},
-            {0, 4, 7},
-            {0, 4, 8},
-            {0, 7, 9},
-            {1, 5, 6},
-            {1, 5, 8},
-            {1, 6, 9},
-            {2, 3, 10},
-            {2, 3, 11},
-            {2, 5, 6},
-            {2, 5, 11},
-            {2, 6, 10},
-            {3, 4, 7},
-            {3, 4, 11},
-            {3, 7, 10},
-            {4, 8, 11},
-            {5, 8, 11},
-            {6, 9, 10},
-            {7, 9, 10}
+            {{0, 1, 8}},
+            {{0, 1, 9}},
+            {{0, 4, 7}},
+            {{0, 4, 8}},
+            {{0, 7, 9}},
+            {{1, 5, 6}},
+            {{1, 5, 8}},
+            {{1, 6, 9}},
+            {{2, 3, 10}},
+            {{2, 3, 11}},
+            {{2, 5, 6}},
+            {{2, 5, 11}},
+            {{2, 6, 10}},
+            {{3, 4, 7}},
+            {{3, 4, 11}},
+            {{3, 7, 10}},
+            {{4, 8, 11}},
+            {{5, 8, 11}},
+            {{6, 9, 10}},
+            {{7, 9, 10}}
     };
 
     Object icosahedron({0, 0, 0}, icosahedronVertices, icosahedronPolygons);
@@ -325,18 +326,18 @@ Object createShelestStar() {
     };
 
     Polygons starPolygons {
-            {16, 2, 10, 8, 0},
-            {12, 14, 4, 8, 0},
-            {16, 17, 1, 12, 0},
-            {17, 3, 11, 9, 1},
-            {12, 14, 5, 9, 1},
-            {13, 15, 6, 10, 2},
-            {16, 17, 3, 13, 2},
-            {13, 15, 7, 11, 3},
-            {18, 6, 10, 8, 4},
-            {18, 19, 5, 14, 4},
-            {19, 7, 11, 9, 5},
-            {18, 19, 7, 15, 6}
+            {{16, 2, 10, 8, 0}},
+            {{12, 14, 4, 8, 0}},
+            {{16, 17, 1, 12, 0}},
+            {{17, 3, 11, 9, 1}},
+            {{12, 14, 5, 9, 1}},
+            {{13, 15, 6, 10, 2}},
+            {{16, 17, 3, 13, 2}},
+            {{13, 15, 7, 11, 3}},
+            {{18, 6, 10, 8, 4}},
+            {{18, 19, 5, 14, 4}},
+            {{19, 7, 11, 9, 5}},
+            {{18, 19, 7, 15, 6}}
     };
 
     Object dodecahedron({0, 0, 0}, dodecahedronVertices, starPolygons);
@@ -405,18 +406,18 @@ Object createDodecahedron() {
     };
 
     Polygons dodecahedronPolygons {
-            {16, 2, 10, 8, 0},
-            {12, 14, 4, 8, 0},
-            {16, 17, 1, 12, 0},
-            {17, 3, 11, 9, 1},
-            {12, 14, 5, 9, 1},
-            {13, 15, 6, 10, 2},
-            {16, 17, 3, 13, 2},
-            {13, 15, 7, 11, 3},
-            {18, 6, 10, 8, 4},
-            {18, 19, 5, 14, 4},
-            {19, 7, 11, 9, 5},
-            {18, 19, 7, 15, 6}
+            {{16, 2, 10, 8, 0}},
+            {{12, 14, 4, 8, 0}},
+            {{16, 17, 1, 12, 0}},
+            {{17, 3, 11, 9, 1}},
+            {{12, 14, 5, 9, 1}},
+            {{13, 15, 6, 10, 2}},
+            {{16, 17, 3, 13, 2}},
+            {{13, 15, 7, 11, 3}},
+            {{18, 6, 10, 8, 4}},
+            {{18, 19, 5, 14, 4}},
+            {{19, 7, 11, 9, 5}},
+            {{18, 19, 7, 15, 6}}
     };
 
     Object dodecahedron({0, 0, 0}, dodecahedronVertices, dodecahedronPolygons);

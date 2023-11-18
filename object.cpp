@@ -1,6 +1,8 @@
 #include <cmath>
 #include <set>
+#include <utility>
 #include "object.h"
+#include "indexpolygon.h"
 
 sf::Vector3f Object::center() const {
     sf::Vector3f result;
@@ -94,17 +96,20 @@ std::vector<sf::Vector3f> Object::rotatedAroundY(float angle) {
     return result;
 }
 
-Object::Object(const sf::Vector3f &position, const std::vector<sf::Vector3f> &vertices, const Polygons &polygons)
-    : Transform(position), _vertices(vertices), _polygons(polygons)
+Object::Object(const sf::Vector3f &position, const std::vector<sf::Vector3f> &vertices, Polygons polygons)
+    : Transform(position), _vertices(vertices), _polygons(std::move(polygons))
 {
-    std::set<std::pair<int, int>> edges;
-    for(const auto& polygon: polygons) {
-        for(int i = 0; i < polygon.size(); ++i) {
-            edges.insert({polygon[i], polygon[(i + 1) % polygon.size()]});
+    /*std::set<std::pair<int, int>> edges;
+    for(const auto& polygon: _polygons) {
+        for(int i = 0; i < polygon.indices().size(); ++i) {
+            edges.insert({polygon.indices()[i], polygon.indices()[(i + 1) % polygon.indices().size()]});
         }
     }
 
-    _edges = std::vector(edges.begin(), edges.end());
+    _edges = std::vector(edges.begin(), edges.end());*/
+    for(auto& polygon: _polygons) {
+        polygon.calculateNormal(this);
+    }
 }
 
 std::vector<sf::Vector3f> Object::transformed(const std::vector<sf::Vector3f>& vertices, const Matrix<4> &m) {

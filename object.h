@@ -4,14 +4,16 @@
 #include "polygon.h"
 #include "transform.h"
 
+class IndexPolygon;
+
 using Edges = std::vector<std::pair<int, int>>;
-using Polygons = std::vector<std::vector<int>>;
+using Polygons = std::vector<IndexPolygon>;
 
 class Object: public Transform {
 public:
     explicit Object(const sf::Vector3f& position, const std::vector<sf::Vector3f>& vertices, const Edges& indices);
     explicit Object(const sf::Vector3f& position, std::vector<sf::Vector3f>&& vertices, Edges&& indices);
-    explicit Object(const sf::Vector3f& position, const std::vector<sf::Vector3f>& vertices, const Polygons& polygons);
+    explicit Object(const sf::Vector3f& position, const std::vector<sf::Vector3f>& vertices, Polygons  polygons);
     Object(const Object& other) = default;
 
     std::vector<sf::Vector3f> movedBy(const sf::Vector3f& v) const override;

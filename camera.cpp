@@ -16,16 +16,18 @@ Camera::Camera(const sf::Vector3f &position, std::vector<Object*>* objects, cons
 
 void Camera::render() const {
     pixbuf->fill(sf::Color::White);
-
     for(auto object: *objects) {
-        auto viewSpace = object->transformed(object->objectToWorldMatrix() * worldToObjectMatrix());
+        for(auto& polygon: object->polygons()) {
+            renderPolygon(polygon, object);
+        }
+        /*auto viewSpace = object->transformed(object->objectToWorldMatrix() * worldToObjectMatrix());
         Object clipped({}, {}, {});
         clip(viewSpace, object, clipped);
 
         auto transformed = projectionTransform(clipped.vertices());
         auto projected = project(transformed);
         auto mapped = mapToScreen(projected);
-        draw(mapped, &clipped);
+        draw(mapped, &clipped);*/
     }
 }
 
@@ -149,4 +151,70 @@ void Camera::resize(const sf::Vector2u &newSize) {
 
     auto screenRatio = (float)screenSize.y / screenSize.x;
     projectionPlaneSize.y = projectionPlaneSize.x * screenRatio;
+}
+
+void Camera::renderPolygon(const IndexPolygon &polygon, Object *obj) const {
+    std::vector<sf::Vector3f> points { polygon.normal() + polygon.center(), polygon.center() };
+    auto worldNormal = Object::transformed(points, obj->objectToWorldMatrix());
+    auto normal = worldNormal[0] - worldNormal[1];
+    if(normal.z >= 0) {
+        return;
+    }
+
+    std::vector<sf::Vector3f> vertices;
+    for(auto idx: polygon.indices()) {
+        vertices.push_back(obj->vertices()[idx]);
+    }
+
+    auto viewSpace = Object::transformed(vertices, obj->objectToWorldMatrix() * worldToObjectMatrix());
+    auto clipped = clipPolygon(viewSpace);
+    auto transformed = projectionTransform(clipped);
+    auto projected = project(transformed);
+    auto mapped = mapToScreen(projected);
+    drawPolygon(mapped);
+}
+
+std::vector<sf::Vector3f> Camera::clipPolygon(const std::vector<sf::Vector3f> &vertices) const {
+    std::vector<sf::Vector3f> result;
+    auto clippingPlane = 0.f;
+    for(int i = 0; i < vertices.size(); ++i) {
+        auto first = vertices[i];
+        auto second = vertices[(i + 1) % vertices.size()];
+        if(first.z >= clippingPlane && second.z >= clippingPlane) {
+            result.push_back(first);
+            continue;
+        }
+
+        if(first.z < clippingPlane && second.z < clippingPlane) {
+            continue;
+        }
+
+        auto x = planeIntersection(first, second, clippingPlane);
+
+        if(first.z < clippingPlane) {
+            result.push_back(x);
+        } else {
+            result.push_back(first);
+            result.push_back(x);
+        }
+    }
+
+    return result;
+}
+
+void Camera::drawPolygon(const std::vector<sf::Vector2i> &vertices) const {
+    for(int i = 0; i < vertices.size(); ++i) {
+        draw_line(*pixbuf, vertices[i], vertices[(i + 1) % vertices.size()], sf::Color::Black);
+    }
+}
+
+void Camera::rasterize(const std::vector<sf::Vector2i> &vertices) const {
+
+}
+
+sf::Vector3f Camera::viewDirection() const {
+    std::vector<sf::Vector3f> points {localPosition, {0, 0, 0}};
+    points = Object::transformed(points, objectToWorldMatrix());
+
+    return normalize(points[1] - points[0]);
 }
