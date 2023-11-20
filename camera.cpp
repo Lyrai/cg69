@@ -4,7 +4,7 @@
 #include "algorithm.h"
 
 Camera::Camera(const sf::Vector3f &position, std::vector<Object*>* objects, const sf::Vector2u& screenSize)
-    : Transform(position), objects(objects), localPosition(sf::Vector3f(0, 0, -3)), projectionPlaneSize(5, 5), screenSize(screenSize), viewAngle(90), zbuffer(new float[screenSize.x * screenSize.y])
+    : Transform(position), objects(objects), localPosition(sf::Vector3f(0, 0, -8)), screenSize(screenSize), viewAngle(90), zbuffer(new float[screenSize.x * screenSize.y]), zTest(true)
 {
     auto obj = Object({}, {{0, 0, -localPosition.z}}, Edges());
     auto vertices = obj.rotatedAroundY(viewAngle / 2);
@@ -18,8 +18,8 @@ void Camera::render() const {
     pixbuf->fill(sf::Color::White);
     for(int i = 0; i < screenSize.y * screenSize.x; ++i) {
         zbuffer[i] = std::numeric_limits<float>::infinity();
-        //zbuffer[i] = 0;
     }
+
     for(auto object: *objects) {
         for(auto& polygon: object->polygons()) {
             renderPolygon(polygon, object);
@@ -160,9 +160,9 @@ void Camera::resize(const sf::Vector2u &newSize) {
 
 void Camera::renderPolygon(const IndexPolygon &polygon, Object *obj) const {
     std::vector<sf::Vector3f> points { polygon.normal() + polygon.center(), polygon.center() };
-    auto worldNormal = Object::transformed(points, obj->objectToWorldMatrix());
+    auto worldNormal = Object::transformed(points, obj->objectToWorldMatrix() * worldToObjectMatrix());
     auto normal = worldNormal[0] - worldNormal[1];
-    if(normal.z >= 0) {
+    if(dot(normal, normalize(localPosition - worldNormal[1])) < 0) {
         return;
     }
 
@@ -178,20 +178,24 @@ void Camera::renderPolygon(const IndexPolygon &polygon, Object *obj) const {
         return;
     }
 
-    if (clipped.size() <= 3) {
+    auto transformed = projectionTransform(clipped);
 
-        auto transformed = projectionTransform(clipped);
+    if(!zTest) {
+        auto projected = project(transformed);
+        auto mapped = mapToScreen(projected);
+        drawPolygon(mapped);
+        return;
+    }
+
+    if (clipped.size() <= 3) {
         rasterize(transformed, polygon);
         return;
-        //auto projected = project(transformed);
-        //auto mapped = mapToScreen(projected);
-        //drawPolygon(mapped);
     }
+
     std::vector<int> indices;
     for (int i = 0; i < clipped.size(); ++i) {
         indices.push_back(i);
     }
-
     IndexPolygon p(indices, polygon.color());
     auto triangles = triangulate(p);
     for (const auto &triangle: triangles) {

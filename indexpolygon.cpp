@@ -13,7 +13,7 @@ void IndexPolygon::calculateNormal(const Object *object) {
     }
     polygonCenter = {polygonCenter.x / indices().size(), polygonCenter.y / indices().size(), polygonCenter.z / indices().size()};
     _center = polygonCenter;
-    auto directionToPolygon = normalize(polygonCenter);
+    auto directionToPolygon = normalize(polygonCenter - object->center());
 
     auto first = vertices[indices()[0]] - vertices[indices()[1]];
     auto second = vertices[indices()[2]] - vertices[indices()[1]];

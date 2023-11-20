@@ -30,10 +30,10 @@ int main() {
     std::vector<Object *> objects;
     auto icosahedron = parseFigure("figures/icosahedron_poly.json");
     icosahedron.moveBy({1, 1, 7});
-    objects.push_back(&icosahedron);
+    //objects.push_back(&icosahedron);
 
 //    Object cube = createIcosahedron();
-    Object cube = parseFigure("figures/tetrahedron_poly.json");
+    Object cube = parseFigure("figures/cube_poly.json");
 //    Object cube = createCube();
     objects.push_back(&cube);
     Object gizmos({0, 0, 0}, {{0, 0, 0},

@@ -17,6 +17,7 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     auto layoutRotationFigure = tgui::HorizontalLayout::create({"100%", "5%"});
     auto layoutLoadSave = tgui::HorizontalLayout::create({"100%", "5%"});
     auto layoutRotFigInput = tgui::HorizontalLayout::create({"20%", "3%"});
+    auto renderingLayout = tgui::HorizontalLayout::create({"100%", "5%"});
     auto fps = tgui::Label::create();
     fps->setTextSize(20);
     fps->setPosition("95%", "7%");
@@ -33,6 +34,7 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     layoutRotationFigure->setVisible(false);
     layoutLoadSave->setVisible(false);
     layoutRotFigInput->setVisible(false);
+    renderingLayout->setVisible(false);
 
     gui.add(layoutMain);
     gui.add(layoutProjection);
@@ -45,6 +47,7 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     gui.add(layoutLoadSave);
     gui.add(fps);
     gui.add(layoutRotFigInput);
+    gui.add(renderingLayout);
 
     //Main
     auto projectionButton = tgui::Button::create("Projections");
@@ -56,17 +59,18 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     auto graphButton = tgui::Button::create("Graph");
     graphButton->setTextSize(20);
     auto rotatingFigButton = tgui::Button::create("Rotation Figures");
-    rotatingFigButton->setTextSize(20);
+    rotatingFigButton->setTextSize(15);
     rotatingFigButton->setWidgetName("rotFig");
     auto loadSaveButton = tgui::Button::create("Load/Save");
     loadSaveButton->setTextSize(20);
+    auto renderingButton = tgui::Button::create("Rendering");
+    renderingButton->setTextSize(20);
 
-    layoutMain->add(projectionButton);
     layoutMain->add(transformationButton);
     layoutMain->add(figuresButton);
     layoutMain->add(graphButton);
-    layoutMain->add(rotatingFigButton);
     layoutMain->add(loadSaveButton);
+    layoutMain->add(renderingButton);
 
     layoutMain->insertSpace(0, 0.025);
     layoutMain->insertSpace(2, 0.025);
@@ -74,7 +78,6 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     layoutMain->insertSpace(6, 0.025);
     layoutMain->insertSpace(8, 0.025);
     layoutMain->insertSpace(10, 0.025);
-    layoutMain->insertSpace(12, 0.025);
 
     //Projection
     auto parallelButton = tgui::Button::create("Parallel");
@@ -139,7 +142,7 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     layoutFigures->add(octahedronButton);
     layoutFigures->add(icosahedronButton);
     layoutFigures->add(dodecahedronButton);
-    layoutFigures->add(shelestStarButton);
+    layoutFigures->add(rotatingFigButton);
     layoutFigures->add(backButtonFig);
 
 
@@ -152,7 +155,6 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     layoutFigures->insertSpace(12, 0.025);
     layoutFigures->insertSpace(14, 0.025);
     layoutFigures->insertSpace(16, 0.025);
-    layoutFigures->insertSpace(18, 0.025);
 
     //Rotation
     auto rotateAxisButton = tgui::Button::create("Axis");
@@ -383,10 +385,28 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     layoutLoadSave->add(loadSaveBackButton);
     layoutLoadSave->addSpace(0.05);
 
+
+    auto zTestButton = tgui::Button::create(cam.getZTest() ? "Z Test Off" : "Z Test On");
+    zTestButton->setTextSize(20);
+    auto renderingBackButton = tgui::Button::create("Back");
+    renderingBackButton->setTextSize(20);
+
+    renderingLayout->addSpace(0.025);
+    renderingLayout->add(projectionButton);
+    renderingLayout->addSpace(0.025);
+    renderingLayout->add(zTestButton);
+    renderingLayout->addSpace(0.025);
+    renderingLayout->add(renderingBackButton);
+    renderingLayout->addSpace(0.025);
+
     parallelButton->onClick([&cam]() { cam.setProjection(Projection::Parallel); });
     perspectiveButton->onClick([&cam]() { cam.setProjection(Projection::Perspective); });
-    projectionButton->onClick([=]() {
+    renderingButton->onClick([=]() {
         layoutMain->setVisible(false);
+        renderingLayout->setVisible(true);
+    });
+    projectionButton->onClick([=]() {
+        renderingLayout->setVisible(false);
         layoutGraphInput->setVisible(false);
         layoutProjection->setVisible(true);
     });
@@ -405,7 +425,7 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
     });
     backButtonProj->onClick([=]() {
         layoutProjection->setVisible(false);
-        layoutMain->setVisible(true);
+        renderingLayout->setVisible(true);
     });
     backButtonTrans->onClick([=]() {
         layoutTransformation->setVisible(false);
@@ -490,13 +510,13 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
         mode = Mode::Scale;
     });
     rotatingFigButton->onClick([=](){
-        layoutMain->setVisible(false);
+        layoutFigures->setVisible(false);
         layoutRotationFigure->setVisible(true);
         layoutRotFigInput->setVisible(true);
     });
-    back4Button->onClick([=,&mode](){
+    back4Button->onClick([=](){
        layoutRotationFigure->setVisible(false);
-       layoutMain->setVisible(true);
+       layoutFigures->setVisible(true);
        layoutRotFigInput->setVisible(false);
     });
     addPointsButton->onClick([&mode](){
@@ -506,5 +526,13 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
         layoutMain->setVisible(false);
         layoutLoadSave->setVisible(true);
         layoutGraphInput->setVisible(false);
+    });
+    zTestButton->onClick([=, &cam]() {
+        cam.setZTest(!cam.getZTest());
+        zTestButton->setText(cam.getZTest() ? "Z Test Off" : "Z Test On");
+    });
+    renderingBackButton->onClick([=]() {
+        renderingLayout->setVisible(false);
+        layoutMain->setVisible(true);
     });
 }

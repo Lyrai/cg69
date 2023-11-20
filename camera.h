@@ -27,6 +27,8 @@ public:
     std::vector<sf::Vector3f> screenToMap(const std::vector<sf::Vector2i> &projected) const;
     void render() const;
     sf::Vector3f viewDirection() const;
+    bool getZTest() const { return zTest; }
+    void setZTest(bool enabled) { zTest = enabled; }
 
 private:
     std::vector<sf::Vector3f> projectionTransform(const std::vector<sf::Vector3f>& obj) const;
@@ -49,6 +51,7 @@ private:
     sf::Vector2u screenSize;
     mutable sf::Texture texture;
     float viewAngle;
+    bool zTest;
 
     static constexpr float projectionMatrix[16] {
             1, 0, 0, 0,
