@@ -13,7 +13,8 @@ class Object: public Transform {
 public:
     explicit Object(const sf::Vector3f& position, const std::vector<sf::Vector3f>& vertices, const Edges& indices);
     explicit Object(const sf::Vector3f& position, std::vector<sf::Vector3f>&& vertices, Edges&& indices);
-    explicit Object(const sf::Vector3f& position, const std::vector<sf::Vector3f>& vertices, Polygons& polygons, bool closedSurface = true);
+    explicit Object(const sf::Vector3f& position, const std::vector<sf::Vector3f>& vertices, Polygons& polygons);
+    explicit Object(const sf::Vector3f& position, const std::vector<sf::Vector3f>& vertices, Polygons& polygons, const sf::Vector3f& polygonFaceDirection);
     Object(const Object& other) = default;
 
     std::vector<sf::Vector3f> movedBy(const sf::Vector3f& v) const override;

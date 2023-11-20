@@ -439,3 +439,29 @@ void saveFigure(const Object& obj, const std::string& path) {
     std::ofstream file(path);
     file << to_string(ns::to_json(obj));
 }
+
+std::vector<Object> constructRoomPlanes() {
+    std::vector<Object> result;
+    result.reserve(6);
+
+    Polygons planePolygons {std::vector<int> {0, 1, 2, 3}};
+    Object bottomPlane({0, 0, 0}, {{-10, 10, -10}, {10, 10, -10}, {10, 10, 50}, {-10, 10, 50}}, planePolygons , {0, -1, 0});
+    result.push_back(bottomPlane);
+
+    Object topPlane({0, 0, 0}, {{-10, -10, -10}, {10, -10, -10}, {10, -10, 50}, {-10, -10, 50}}, planePolygons , {0, 1, 0});
+    result.push_back(topPlane);
+
+    Object leftPlane({0, 0, 0}, {{-10, 10, -10}, {-10, 10, 50}, {-10, -10, 50}, {-10, -10, -10}}, planePolygons , {1, 0, 0});
+    result.push_back(leftPlane);
+
+    Object rightPlane({0, 0, 0}, {{10, 10, -10}, {10, 10, 50}, {10, -10, 50}, {10, -10, -10}}, planePolygons , {-1, 0, 0});
+    result.push_back(rightPlane);
+
+    Object frontPlane({0, 0, 0}, {{-10, 10, 50}, {10, 10, 50}, {10, -10, 50}, {-10, -10, 50}}, planePolygons , {0, 0, -1});
+    result.push_back(frontPlane);
+
+    Object backPlane({0, 0, 0}, {{-10, 10, -10}, {10, 10, -10}, {10, -10, -10}, {-10, -10, -10}}, planePolygons , {0, 0, 1});
+    result.push_back(backPlane);
+
+    return result;
+}

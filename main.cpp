@@ -30,11 +30,13 @@ int main() {
     std::vector<Object *> objects;
     auto icosahedron = parseFigure("figures/icosahedron_poly.json");
     icosahedron.moveBy({1, 1, 7});
+    auto roomPlanes = constructRoomPlanes();
+    for (auto & roomPlane : roomPlanes) {
+        objects.push_back(&roomPlane);
+    }
     //objects.push_back(&icosahedron);
 
-//    Object cube = createIcosahedron();
     Object cube = parseFigure("figures/cube_poly.json");
-//    Object cube = createCube();
     objects.push_back(&cube);
     Object gizmos({0, 0, 0}, {{0, 0, 0},
                               {1, 0, 0},
@@ -115,7 +117,7 @@ int main() {
             }
         }
 
-        cube = Object({0, 0, 0}, points, polygons, false);
+        cube = Object({0, 0, 0}, points, polygons, {0, -1, 0});
     };
 
     graphX0->onTextChange([&]() { x0 = graphX0->getText().toFloat(); drawGraph(); });
@@ -123,14 +125,6 @@ int main() {
     graphY0->onTextChange([&]() { y0 = graphY0->getText().toFloat(); drawGraph(); });
     graphY1->onTextChange([&]() { y1 = graphY1->getText().toFloat(); drawGraph(); });
     graphSteps->onTextChange([&]() { steps = graphSteps->getText().toInt(); drawGraph(); });
-    /*auto fileDialog = tgui::FileDialog::create();
-    gui.add(fileDialog);
-    fileDialog->setPath("figures/");
-    auto filename = fileDialog->getFilename();
-    fileDialog->setFileMustExist(false);
-    fileDialog->onFileSelect([&]() {
-        cube = parseFigure(fileDialog->getSelectedPaths()[0].asNativeString());
-    });*/
 
     auto loadButton = gui.get<tgui::Button>("load");
     auto saveButton = gui.get<tgui::Button>("save");
@@ -164,11 +158,9 @@ int main() {
         if(!pointsFig.empty()) {
             std::vector<sf::Vector3f> vertices;
             auto worldSpace = cam.screenToMap(pointsFig);
-            //vertices.emplace_back(0, worldSpace[0].y, 0);
             for (const auto &vertex: worldSpace) {
                 vertices.push_back(vertex);
             }
-            //vertices.emplace_back(0, worldSpace[worldSpace.size() - 1].y, 0);
             cube = constructRotationFigure(vertices, cam,rotSteps->getText().toInt(),axis);
         }
     });

@@ -97,18 +97,27 @@ std::vector<sf::Vector3f> Object::rotatedAroundY(float angle) {
     return result;
 }
 
-Object::Object(const sf::Vector3f &position, const std::vector<sf::Vector3f> &vertices, Polygons& polygons, bool closedSurface)
+Object::Object(const sf::Vector3f &position, const std::vector<sf::Vector3f> &vertices, Polygons& polygons)
+        : Transform(position), _vertices(vertices)
+{
+    for(auto& polygon: polygons) {
+        polygon.setColor({(sf::Uint8)(rand() % 256), (sf::Uint8)(rand() % 256), (sf::Uint8)(rand() % 256)});
+        auto triangles = triangulate(polygon);
+        for (auto &triangle: triangles) {
+            triangle.calculateNormal(this);
+            _polygons.push_back(triangle);
+        }
+    }
+}
+
+Object::Object(const sf::Vector3f &position, const std::vector<sf::Vector3f> &vertices, Polygons& polygons, const sf::Vector3f& polygonFaceDirection)
     : Transform(position), _vertices(vertices)
 {
     for(auto& polygon: polygons) {
         polygon.setColor({(sf::Uint8)(rand() % 256), (sf::Uint8)(rand() % 256), (sf::Uint8)(rand() % 256)});
         auto triangles = triangulate(polygon);
         for (auto &triangle: triangles) {
-            if(closedSurface) {
-                triangle.calculateNormal(this);
-            } else  {
-                triangle.calculateNormal(this, {0, -1, 0});
-            }
+            triangle.calculateNormal(this, polygonFaceDirection);
             _polygons.push_back(triangle);
         }
     }

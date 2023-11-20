@@ -315,3 +315,20 @@ sf::Vector3f Camera::viewDirection() const {
 
     return normalize(points[1] - points[0]);
 }
+
+void Camera::rotateAroundLine(float angle, Axis axis) {
+    auto tmp = localPosition;
+    moveBy(-tmp);
+    switch (axis) {
+        case Axis::X:
+            rotateAroundX(angle);
+            break;
+        case Axis::Y:
+            rotateAroundY(angle);
+            break;
+        case Axis::Z:
+            rotateAroundZ(angle);
+            break;
+    }
+    moveBy(tmp);
+}
