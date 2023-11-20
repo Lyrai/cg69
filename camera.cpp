@@ -4,7 +4,7 @@
 #include "algorithm.h"
 
 Camera::Camera(const sf::Vector3f &position, std::vector<Object*>* objects, const sf::Vector2u& screenSize)
-    : Transform(position), objects(objects), localPosition(sf::Vector3f(0, 0, -3)), projectionPlaneSize(5, 5), screenSize(screenSize), viewAngle(90)
+    : Transform(position), objects(objects), localPosition(sf::Vector3f(0, 0, -3)), projectionPlaneSize(5, 5), screenSize(screenSize), viewAngle(90), zbuffer(new float[screenSize.x * screenSize.y])
 {
     auto obj = Object({}, {{0, 0, -localPosition.z}}, Edges());
     auto vertices = obj.rotatedAroundY(viewAngle / 2);
@@ -16,6 +16,10 @@ Camera::Camera(const sf::Vector3f &position, std::vector<Object*>* objects, cons
 
 void Camera::render() const {
     pixbuf->fill(sf::Color::White);
+    for(int i = 0; i < screenSize.y * screenSize.x; ++i) {
+        zbuffer[i] = std::numeric_limits<float>::infinity();
+        //zbuffer[i] = 0;
+    }
     for(auto object: *objects) {
         for(auto& polygon: object->polygons()) {
             renderPolygon(polygon, object);
@@ -38,7 +42,6 @@ void Camera::draw(const std::vector<sf::Vector2i> &vertices, Object *obj) const 
 }
 
 void Camera::setProjection(Projection proj) {
-    projection = proj;
     if(proj == Projection::Parallel) {
         projectionTransformMatrix = Matrix<4>::identity();
     } else {
@@ -151,6 +154,8 @@ void Camera::resize(const sf::Vector2u &newSize) {
 
     auto screenRatio = (float)screenSize.y / screenSize.x;
     projectionPlaneSize.y = projectionPlaneSize.x * screenRatio;
+    delete[] zbuffer;
+    zbuffer = new float[screenSize.x * screenSize.y];
 }
 
 void Camera::renderPolygon(const IndexPolygon &polygon, Object *obj) const {
@@ -168,10 +173,36 @@ void Camera::renderPolygon(const IndexPolygon &polygon, Object *obj) const {
 
     auto viewSpace = Object::transformed(vertices, obj->objectToWorldMatrix() * worldToObjectMatrix());
     auto clipped = clipPolygon(viewSpace);
-    auto transformed = projectionTransform(clipped);
-    auto projected = project(transformed);
-    auto mapped = mapToScreen(projected);
-    drawPolygon(mapped);
+
+    if(clipped.empty()) {
+        return;
+    }
+
+    if (clipped.size() <= 3) {
+
+        auto transformed = projectionTransform(clipped);
+        rasterize(transformed, polygon);
+        return;
+        //auto projected = project(transformed);
+        //auto mapped = mapToScreen(projected);
+        //drawPolygon(mapped);
+    }
+    std::vector<int> indices;
+    for (int i = 0; i < clipped.size(); ++i) {
+        indices.push_back(i);
+    }
+
+    IndexPolygon p(indices, polygon.color());
+    auto triangles = triangulate(p);
+    for (const auto &triangle: triangles) {
+        vertices.clear();
+        for (const auto &index: triangle.indices()) {
+            vertices.push_back(clipped[index]);
+        }
+
+        auto transformed = projectionTransform(vertices);
+        rasterize(transformed, triangle);
+    }
 }
 
 std::vector<sf::Vector3f> Camera::clipPolygon(const std::vector<sf::Vector3f> &vertices) const {
@@ -208,8 +239,70 @@ void Camera::drawPolygon(const std::vector<sf::Vector2i> &vertices) const {
     }
 }
 
-void Camera::rasterize(const std::vector<sf::Vector2i> &vertices) const {
+void Camera::rasterize(const std::vector<sf::Vector3f> &vertices, const IndexPolygon& polygon) const {
+    auto v = vertices;
+    if (v[0].y > v[1].y) {
+        std::swap(v[0], v[1]);
+    }
+    if (v[0].y > v[2].y) {
+        std::swap(v[0], v[2]);
+    }
+    if (v[1].y > v[2].y) {
+        std::swap(v[1], v[2]);
+    }
 
+    float zinv[3] {
+            v[0].z,
+            v[1].z,
+            v[2].z
+    };
+
+    auto screenSpace = mapToScreen(project(v));
+    int height = screenSpace[2].y - screenSpace[0].y;
+    if(height < 1e-5) {
+        return;
+    }
+
+    for(int i = 0; i < 2; ++i) {
+        int segmentHeight = screenSpace[1 + i].y - screenSpace[i].y;
+        if(segmentHeight < 1e-5) {
+            continue;
+        }
+
+        for(int y = screenSpace[i].y; y <= screenSpace[1 + i].y; ++y) {
+            if(y < 0 || y >= screenSize.y) {
+                continue;
+            }
+
+            float alpha = (float) (y - screenSpace[0].y) / height;
+            float beta = (float) (y - screenSpace[i].y) / segmentHeight;
+
+            float zinvA = zinv[0] + (zinv[2] - zinv[0]) * alpha;
+            float zinvB = zinv[i] + (zinv[1 + i] - zinv[i]) * beta;
+
+            int A = screenSpace[0].x + (screenSpace[2].x - screenSpace[0].x) * alpha;
+            int B = screenSpace[i].x + (screenSpace[1 + i].x - screenSpace[i].x) * beta;
+
+            if (A > B) {
+                std::swap(A, B);
+                std::swap(zinvA, zinvB);
+            }
+
+            for (int x = A; x <= B; ++x) {
+                if(x < 0 || x >= screenSize.x) {
+                    continue;
+                }
+
+                float gamma = (float) (x - A) / (B - A);
+                float z = zinvA + (zinvB - zinvA) * gamma;
+                auto bufferIdx = y * screenSize.x + x;
+                if(zbuffer[bufferIdx] > z) {
+                    zbuffer[bufferIdx] = z;
+                    pixbuf->at(x, y) = polygon.color();
+                }
+            }
+        }
+    }
 }
 
 sf::Vector3f Camera::viewDirection() const {

@@ -28,6 +28,9 @@ int main() {
 
     Pixbuf pixbuf(sf::Vector2u(window_size.x, window_size.y));
     std::vector<Object *> objects;
+    auto icosahedron = parseFigure("figures/icosahedron_poly.json");
+    icosahedron.moveBy({1, 1, 7});
+    objects.push_back(&icosahedron);
 
 //    Object cube = createIcosahedron();
     Object cube = parseFigure("figures/tetrahedron_poly.json");
@@ -112,7 +115,7 @@ int main() {
             }
         }
 
-        cube = Object({0, 0, 0}, points, polygons);
+        cube = Object({0, 0, 0}, points, polygons, false);
     };
 
     graphX0->onTextChange([&]() { x0 = graphX0->getText().toFloat(); drawGraph(); });
