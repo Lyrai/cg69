@@ -43,6 +43,7 @@ private:
     void rasterize(const std::vector<sf::Vector3f>& vertices, const IndexPolygon& polygon) const;
 
 private:
+    Projection projection;
     Matrix<4> projectionTransformMatrix;
     mutable Pixbuf* pixbuf;
     float* zbuffer;

@@ -42,6 +42,7 @@ void Camera::draw(const std::vector<sf::Vector2i> &vertices, Object *obj) const 
 }
 
 void Camera::setProjection(Projection proj) {
+    projection = proj;
     if(proj == Projection::Parallel) {
         projectionTransformMatrix = Matrix<4>::identity();
     } else {
@@ -162,7 +163,8 @@ void Camera::renderPolygon(const IndexPolygon &polygon, Object *obj) const {
     std::vector<sf::Vector3f> points { polygon.normal() + polygon.center(), polygon.center() };
     auto worldNormal = Object::transformed(points, obj->objectToWorldMatrix() * worldToObjectMatrix());
     auto normal = worldNormal[0] - worldNormal[1];
-    if(dot(normal, normalize(localPosition - worldNormal[1])) < 0) {
+    auto viewVector = projection == Projection::Perspective ? normalize(localPosition - worldNormal[1]) : normalize(localPosition);
+    if(dot(normal, viewVector) < 0) {
         return;
     }
 
