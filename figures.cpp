@@ -63,8 +63,8 @@ namespace ns {
     }
 }
 
-std::vector<sf::Vector3f> parseVertices(const std::vector<std::vector<std::string>> &raw_vertices) {
-    auto rval = std::vector<sf::Vector3f>();
+std::vector<Vertex> parseVertices(const std::vector<std::vector<std::string>> &raw_vertices) {
+    auto rval = std::vector<Vertex>();
     for (auto point_raw: raw_vertices) {
         sf::Vector3f point(eval(point_raw.at(0)), eval(point_raw.at(1)), eval(point_raw.at(2)));
         rval.emplace_back(point);
@@ -94,7 +94,7 @@ Polygons parsePolygons(const std::vector<std::vector<std::string>> &raw_polygons
 }
 
 Object createCube() {
-    std::vector<sf::Vector3f> cubeVertices{
+    std::vector<Vertex> cubeVertices{
             {-0.5, -0.5, -0.5},
             {0.5,  -0.5, -0.5},
             {0.5,  0.5,  -0.5},
@@ -119,7 +119,7 @@ Object createCube() {
 }
 
 Object createOctahedron() {
-    std::vector<sf::Vector3f> octahedronVertices{
+    std::vector<Vertex> octahedronVertices{
             {0.0,  0.0,  -1.0},
             {1.0,  0.0,  0.0},
             {0.0,  -1.0, 0.0},
@@ -159,7 +159,7 @@ Object createOctahedron() {
 }
 
 Object createTetrahedron() {
-    std::vector<sf::Vector3f> tetrahedronVertices{
+    std::vector<Vertex> tetrahedronVertices{
             {(float)sqrt(3)/2, 0, 0},
             {0, 0.5, 0},
             {0, -0.5, 0},
@@ -189,7 +189,7 @@ Object createTetrahedron() {
 Object createIcosahedron() {
     float phi = 1.6180;
     float coef = sqrt(1 + phi * phi);
-    std::vector<sf::Vector3f> icosahedronVertices{
+    std::vector<Vertex> icosahedronVertices{
             {phi / coef,   1.0f / coef,  0},
             {phi / coef,   -1.0f / coef, 0},
             {-phi / coef,  -1.0f / coef, 0},
@@ -267,7 +267,7 @@ Object createIcosahedron() {
 Object createShelestStar() {
     float coef = sqrt(1 + 1.6180 * 1.6180);
     float phi = 1.6180f * coef;
-    std::vector<sf::Vector3f> dodecahedronVertices{
+    std::vector<Vertex> dodecahedronVertices{
             {1.f / coef,  1.f / coef,  1.f / coef},//0
             {1.f / coef,  1.f / coef,  -1.f / coef},//1
             {1.f / coef,  -1.f / coef, 1.f / coef},//2
@@ -347,7 +347,7 @@ Object createShelestStar() {
 Object createDodecahedron() {
     float phi = 1.6180;
     float coef = sqrt(1 + phi * phi);
-    std::vector<sf::Vector3f> dodecahedronVertices{
+    std::vector<Vertex> dodecahedronVertices{
             {1,        1,        1},//0
             {1,        1,        -1},//1
             {1,        -1,       1},//2
@@ -428,7 +428,7 @@ Object parseFigure(const std::string &path) {
     std::ifstream f(path);
     json data = json::parse(f);
     auto st = data.get<ns::raw_data>();
-    std::vector<sf::Vector3f> vertices = parseVertices(st._vertices);
+    std::vector<Vertex> vertices = parseVertices(st._vertices);
 //    std::vector<std::pair<int, int>> Edges = parseEdges(st._edges);
     Polygons polygons = parsePolygons(st._polygons);
     Object figure({0, 0, 0}, vertices, polygons);

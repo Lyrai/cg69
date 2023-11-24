@@ -18,12 +18,6 @@ public:
 
     void resize(const sf::Vector2u& newSize);
 
-    std::vector<sf::Vector3f> movedBy(const sf::Vector3f &v) const override;
-    std::vector<sf::Vector3f> rotatedAround(Line *line, float cosa, float sina) const override;
-    std::vector<sf::Vector3f> scaledAround(const sf::Vector3f &p, float kx, float ky, float kz) const override;
-    std::vector<sf::Vector3f> rotatedAroundX(float angle) override;
-    std::vector<sf::Vector3f> rotatedAroundY(float angle) override;
-    std::vector<sf::Vector3f> transformed(const Matrix<4> &m) const override;
     void rotateAroundLine(float angle, Axis axis) override;
     std::vector<sf::Vector3f> screenToMap(const std::vector<sf::Vector2i> &projected) const;
     void render() const;
@@ -32,15 +26,15 @@ public:
     void setZTest(bool enabled) { zTest = enabled; }
 
 private:
-    std::vector<sf::Vector3f> projectionTransform(const std::vector<sf::Vector3f>& obj) const;
-    std::vector<sf::Vector2f> project(const std::vector<sf::Vector3f>& vertices) const;
+    std::vector<Vertex> projectionTransform(const std::vector<Vertex>& obj) const;
+    std::vector<sf::Vector2f> project(const std::vector<Vertex>& vertices) const;
     std::vector<sf::Vector2i> mapToScreen(const std::vector<sf::Vector2f>& projected) const;
-    void clip(const std::vector<sf::Vector3f>& vertices, Object* obj, Object& result) const;
-    std::vector<sf::Vector3f> clipPolygon(const std::vector<sf::Vector3f> &vertices) const;
+    void clip(const std::vector<Vertex>& vertices, Object* obj, Object& result) const;
+    std::vector<Vertex> clipPolygon(const std::vector<Vertex> &vertices) const;
     void draw(const std::vector<sf::Vector2i>& vertices, Object* obj) const;
     void drawPolygon(const std::vector<sf::Vector2i>& vertices) const;
     void renderPolygon(const IndexPolygon& polygon, Object* obj) const;
-    void rasterize(const std::vector<sf::Vector3f>& vertices, const IndexPolygon& polygon) const;
+    void rasterize(const std::vector<Vertex>& vertices, const IndexPolygon& polygon) const;
 
 private:
     Projection projection;

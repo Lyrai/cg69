@@ -37,6 +37,8 @@ int main() {
     //objects.push_back(&icosahedron);
 
     Object cube = parseFigure("figures/cube_poly.json");
+    //Polygons polygons {std::vector<int> {0, 1, 2, 3}};
+    //Object cube = Object({0, 0, 0}, {Vertex(0, 0, 0, sf::Color::Green), Vertex(1, 0, 0, sf::Color::White), Vertex(1, 1, 0, sf::Color::Blue), Vertex(0, 1, 0, sf::Color::Red)}, polygons);
     objects.push_back(&cube);
     Object gizmos({0, 0, 0}, {{0, 0, 0},
                               {1, 0, 0},
@@ -100,7 +102,7 @@ int main() {
         auto ystep = (y1 - y0) / steps;
         auto xstep = (x1 - x0) / steps;
 
-        std::vector<sf::Vector3f> points;
+        std::vector<Vertex> points;
         for (int i = 0; i < steps; ++i) {
             auto y = y0 + ystep * i;
             for (int j = 0; j < steps; ++j) {
@@ -208,7 +210,10 @@ int main() {
                 edges.emplace_back(i, i + 1);
             }
 
-            std::vector<sf::Vector3f> vertices = cam.screenToMap(pointsFig);
+            std::vector<sf::Vector3f> points = cam.screenToMap(pointsFig);
+            std::vector<Vertex> vertices;
+            vertices.resize(points.size());
+            std::transform(points.begin(), points.end(), vertices.begin(), [](auto v) { return Vertex(v); });
             cube = Object({0, 0, 0}, vertices, edges);
         } else {
             pointsFig.clear();

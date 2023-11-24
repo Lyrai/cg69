@@ -8,23 +8,23 @@
 sf::Vector3f Object::center() const {
     sf::Vector3f result;
     for(const auto& vertex: vertices()) {
-        result += vertex;
+        result += { vertex.x, vertex.y, vertex.z };
     }
 
     return { result.x / vertices().size(), result.y / vertices().size(), result.z / vertices().size() };
 }
 
-Object::Object(const sf::Vector3f& position, const std::vector<sf::Vector3f> &vertices, const Edges &edges)
+Object::Object(const sf::Vector3f& position, const std::vector<Vertex> &vertices, const Edges &edges)
     : Transform(position), _vertices(vertices), _edges(edges)
 { }
 
-Object::Object(const sf::Vector3f &position, std::vector<sf::Vector3f> &&vertices, Edges&& indices)
+Object::Object(const sf::Vector3f &position, std::vector<Vertex> &&vertices, Edges&& indices)
     : Transform(position), _vertices(vertices), _edges(indices)
 { }
 
 
-std::vector<sf::Vector3f> Object::movedBy(const sf::Vector3f &v) const {
-    std::vector<sf::Vector3f> result;
+std::vector<Vertex> Object::movedBy(const sf::Vector3f &v) const {
+    std::vector<Vertex> result;
     result.reserve(vertices().size());
 
     for (const auto &point: vertices()) {
@@ -34,16 +34,16 @@ std::vector<sf::Vector3f> Object::movedBy(const sf::Vector3f &v) const {
     return result;
 }
 
-std::vector<sf::Vector3f> Object::rotatedAround(Line *line, float cosa, float sina) const {
-    return std::vector<sf::Vector3f>();
+std::vector<Vertex> Object::rotatedAround(Line *line, float cosa, float sina) const {
+    return { };
 }
 
-std::vector<sf::Vector3f> Object::scaledAround(const sf::Vector3f &p, float kx, float ky, float kz) const {
-    return std::vector<sf::Vector3f>();
+std::vector<Vertex> Object::scaledAround(const sf::Vector3f &p, float kx, float ky, float kz) const {
+    return { };
 }
 
-std::vector<sf::Vector3f> Object::transformed(const Matrix<4> &m) const {
-    std::vector<sf::Vector3f> result;
+std::vector<Vertex> Object::transformed(const Matrix<4> &m) const {
+    std::vector<Vertex> result;
     result.reserve(vertices().size());
 
     for(int i = 0; i < vertices().size(); ++i) {
@@ -55,8 +55,8 @@ std::vector<sf::Vector3f> Object::transformed(const Matrix<4> &m) const {
     return result;
 }
 
-std::vector<sf::Vector3f> Object::rotatedAroundX(float angle) {
-    std::vector<sf::Vector3f> result;
+std::vector<Vertex> Object::rotatedAroundX(float angle) {
+    std::vector<Vertex> result;
     result.reserve(vertices().size());
 
     float sina = sin(angle * M_PI / 180);
@@ -76,8 +76,8 @@ std::vector<sf::Vector3f> Object::rotatedAroundX(float angle) {
     return result;
 }
 
-std::vector<sf::Vector3f> Object::rotatedAroundY(float angle) {
-    std::vector<sf::Vector3f> result;
+std::vector<Vertex> Object::rotatedAroundY(float angle) {
+    std::vector<Vertex> result;
     result.reserve(vertices().size());
 
     float sina = sin(angle * M_PI / 180);
@@ -97,50 +97,70 @@ std::vector<sf::Vector3f> Object::rotatedAroundY(float angle) {
     return result;
 }
 
-Object::Object(const sf::Vector3f &position, const std::vector<sf::Vector3f> &vertices, Polygons& polygons)
+Object::Object(const sf::Vector3f &position, const std::vector<Vertex> &vertices, Polygons& polygons)
         : Transform(position), _vertices(vertices)
 {
+    std::vector<std::vector<int>> containingPolygons;
+    containingPolygons.resize(_vertices.size());
+
     for(auto& polygon: polygons) {
         polygon.setColor({(sf::Uint8)(rand() % 256), (sf::Uint8)(rand() % 256), (sf::Uint8)(rand() % 256)});
         auto triangles = triangulate(polygon);
         for (auto &triangle: triangles) {
             triangle.calculateNormal(this);
+            for(auto idx: triangle.indices()) {
+                containingPolygons[idx].push_back(idx);
+            }
             _polygons.push_back(triangle);
         }
     }
+
+    for (int i = 0; i < _vertices.size(); ++i) {
+        _vertices[i].setColor({(sf::Uint8)(rand() % 256), (sf::Uint8)(rand() % 256), (sf::Uint8)(rand() % 256)});
+        _vertices[i].calculateNormal(containingPolygons[i], this);
+    }
 }
 
-Object::Object(const sf::Vector3f &position, const std::vector<sf::Vector3f> &vertices, Polygons& polygons, const sf::Vector3f& polygonFaceDirection)
+Object::Object(const sf::Vector3f &position, const std::vector<Vertex> &vertices, Polygons& polygons, const sf::Vector3f& polygonFaceDirection)
     : Transform(position), _vertices(vertices)
 {
+    std::vector<std::vector<int>> containingPolygons;
+    containingPolygons.resize(_vertices.size());
+
     for(auto& polygon: polygons) {
         polygon.setColor({(sf::Uint8)(rand() % 256), (sf::Uint8)(rand() % 256), (sf::Uint8)(rand() % 256)});
         auto triangles = triangulate(polygon);
         for (auto &triangle: triangles) {
             triangle.calculateNormal(this, polygonFaceDirection);
+            for(auto idx: triangle.indices()) {
+                containingPolygons[idx].push_back(idx);
+            }
             _polygons.push_back(triangle);
         }
     }
+
+    for (int i = 0; i < _vertices.size(); ++i) {
+        _vertices[i].setColor({(sf::Uint8)(rand() % 256), (sf::Uint8)(rand() % 256), (sf::Uint8)(rand() % 256)});
+        _vertices[i].calculateNormal(containingPolygons[i], this);
+    }
 }
 
-std::vector<sf::Vector3f> Object::transformed(const std::vector<sf::Vector3f>& vertices, const Matrix<4> &m) {
-    std::vector<sf::Vector3f> result;
+std::vector<Vertex> Object::transformed(const std::vector<Vertex>& vertices, const Matrix<4> &m) {
+    std::vector<Vertex> result;
     result.reserve(vertices.size());
 
     for(int i = 0; i < vertices.size(); ++i) {
-        auto tmp = sf::Vector4f(vertices[i].x, vertices[i].y, vertices[i].z, 1);
-        auto v4 = tmp * m;
-        result.emplace_back(v4.x / v4.w, v4.y / v4.w, v4.z / v4.w);
+        result.push_back(vertices[i] * m);
     }
 
     return result;
 }
 
-void Object::transform(std::vector<sf::Vector3f> &vertices, const Matrix<4> &m) {
+void Object::transform(std::vector<Vertex> &vertices, const Matrix<4> &m) {
     for(int i = 0; i < vertices.size(); ++i) {
         auto tmp = sf::Vector4f(vertices[i].x, vertices[i].y, vertices[i].z, 1);
         auto v4 = tmp * m;
-        vertices[i] = sf::Vector3f(v4.x / v4.w, v4.y / v4.w, v4.z / v4.w);
+        vertices[i] = Vertex(v4.x / v4.w, v4.y / v4.w, v4.z / v4.w);
     }
 }
 std::vector<sf::Vector3f> Object::rotatedAroundY(const std::vector<sf::Vector3f> &vertices, float angle){
@@ -215,12 +235,25 @@ Object &Object::operator=(Object &&other) {
     return *this;
 }
 
-std::vector<sf::Vector3f> Object::movedBy(const std::vector<sf::Vector3f>& vertices, sf::Vector3f delta) {
-    std::vector<sf::Vector3f> result;
+std::vector<Vertex> Object::movedBy(const std::vector<Vertex>& vertices, sf::Vector3f delta) {
+    std::vector<Vertex> result;
     result.reserve(vertices.size());
 
     for (const auto &point: vertices) {
         result.push_back(point + delta);
+    }
+
+    return result;
+}
+
+std::vector<sf::Vector3f> Object::transformed(const std::vector<sf::Vector3f> &vertices, const Matrix<4> &m) {
+    std::vector<sf::Vector3f> result;
+    result.reserve(vertices.size());
+
+    for(int i = 0; i < vertices.size(); ++i) {
+        auto tmp = sf::Vector4f(vertices[i].x, vertices[i].y, vertices[i].z, 1);
+        auto v4 = tmp * m;
+        result.emplace_back(v4.x / v4.w, v4.y / v4.w, v4.z / v4.w);
     }
 
     return result;

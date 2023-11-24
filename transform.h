@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "line.h"
+#include "vertex.h"
 
 enum class Axis {
     X,
@@ -23,13 +24,6 @@ public:
     virtual void mirrorAroundAxis(Axis axis);
     virtual void transform(const Matrix<3> &m, const sf::Vector3f &v);
     virtual void transform(const Matrix<4> &m);
-    virtual std::vector<sf::Vector3f> movedBy(const sf::Vector3f &v) const = 0;
-    virtual std::vector<sf::Vector3f> rotatedAround(Line *line, float cosa, float sina) const = 0;
-    virtual std::vector<sf::Vector3f> rotatedAroundX(float angle) = 0;
-    virtual std::vector<sf::Vector3f> rotatedAroundY(float angle) = 0;
-    virtual std::vector<sf::Vector3f> scaledAround(const sf::Vector3f &p, float kx, float ky, float kz) const = 0;
-    virtual std::vector<sf::Vector3f> transformed(const Matrix<3> &m, const sf::Vector3f &v) const;
-    virtual std::vector<sf::Vector3f> transformed(const Matrix<4> &m) const = 0;
 
     Matrix<4> objectToWorldMatrix() const;
     Matrix<4> worldToObjectMatrix() const;

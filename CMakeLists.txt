@@ -22,5 +22,10 @@ add_executable(cg6 main.cpp pixbuf.cpp pixel.cpp polygon.cpp line.cpp
         expressionparser.cpp
         expressionparser.h
         indexpolygon.cpp
-        indexpolygon.h)
+        indexpolygon.h
+        lightsource.cpp
+        lightsource.h
+        vertex.cpp
+        vertex.h
+)
 target_link_libraries(cg6 sfml-graphics sfml-window sfml-system tgui nlohmann_json::nlohmann_json)

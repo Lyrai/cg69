@@ -11,36 +11,37 @@ using Polygons = std::vector<IndexPolygon>;
 
 class Object: public Transform {
 public:
-    explicit Object(const sf::Vector3f& position, const std::vector<sf::Vector3f>& vertices, const Edges& indices);
-    explicit Object(const sf::Vector3f& position, std::vector<sf::Vector3f>&& vertices, Edges&& indices);
-    explicit Object(const sf::Vector3f& position, const std::vector<sf::Vector3f>& vertices, Polygons& polygons);
-    explicit Object(const sf::Vector3f& position, const std::vector<sf::Vector3f>& vertices, Polygons& polygons, const sf::Vector3f& polygonFaceDirection);
+    explicit Object(const sf::Vector3f& position, const std::vector<Vertex>& vertices, const Edges& indices);
+    explicit Object(const sf::Vector3f& position, std::vector<Vertex>&& vertices, Edges&& indices);
+    explicit Object(const sf::Vector3f& position, const std::vector<Vertex>& vertices, Polygons& polygons);
+    explicit Object(const sf::Vector3f& position, const std::vector<Vertex>& vertices, Polygons& polygons, const sf::Vector3f& polygonFaceDirection);
     Object(const Object& other) = default;
 
-    std::vector<sf::Vector3f> movedBy(const sf::Vector3f& v) const override;
-    std::vector<sf::Vector3f> rotatedAround(Line* line, float cosa, float sina) const override;
-    std::vector<sf::Vector3f> rotatedAroundX(float angle) override;
-    std::vector<sf::Vector3f> rotatedAroundY(float angle) override;
-    std::vector<sf::Vector3f> scaledAround(const sf::Vector3f& p, float kx, float ky, float kz) const override;
-    std::vector<sf::Vector3f> transformed(const Matrix<4>& m) const override;
+    std::vector<Vertex> movedBy(const sf::Vector3f& v) const;
+    std::vector<Vertex> rotatedAround(Line* line, float cosa, float sina) const;
+    std::vector<Vertex> rotatedAroundX(float angle);
+    std::vector<Vertex> rotatedAroundY(float angle);
+    std::vector<Vertex> scaledAround(const sf::Vector3f& p, float kx, float ky, float kz) const;
+    std::vector<Vertex> transformed(const Matrix<4>& m) const;
+    static std::vector<Vertex> transformed(const std::vector<Vertex>& vertices, const Matrix<4> &m);
     static std::vector<sf::Vector3f> transformed(const std::vector<sf::Vector3f>& vertices, const Matrix<4> &m);
     static std::vector<sf::Vector3f> rotatedAroundY(const std::vector<sf::Vector3f>& vertices, float angle);
     static std::vector<sf::Vector3f> rotatedAroundX(const std::vector<sf::Vector3f>& vertices, float angle);
     static std::vector<sf::Vector3f> rotatedAroundZ(const std::vector<sf::Vector3f>& vertices, float angle);
-    static std::vector<sf::Vector3f> movedBy(const std::vector<sf::Vector3f>& vertices, sf::Vector3f delta);
+    static std::vector<Vertex> movedBy(const std::vector<Vertex>& vertices, sf::Vector3f delta);
 
-    static void transform(std::vector<sf::Vector3f>& vertices, const Matrix<4> &m);
+    static void transform(std::vector<Vertex>& vertices, const Matrix<4> &m);
 
     sf::Vector3f center() const;
 
     const std::vector<std::pair<int, int>>& edges() const { return _edges; }
-    const std::vector<sf::Vector3f>& vertices() const { return _vertices; }
+    const std::vector<Vertex>& vertices() const { return _vertices; }
     const Polygons& polygons() const { return _polygons; }
 
     Object& operator=(Object&& other);
 
 private:
-    std::vector<sf::Vector3f> _vertices;
+    std::vector<Vertex> _vertices;
     Edges _edges;
     Polygons _polygons;
 };

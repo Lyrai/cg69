@@ -1,5 +1,7 @@
 #include <iostream>
 #include <cmath>
+#include <thread>
+#include <cassert>
 #include "camera.h"
 #include "algorithm.h"
 
@@ -8,7 +10,7 @@ Camera::Camera(const sf::Vector3f &position, std::vector<Object*>* objects, cons
 {
     auto obj = Object({}, {{0, 0, -localPosition.z}}, Edges());
     auto vertices = obj.rotatedAroundY(viewAngle / 2);
-    auto projectionPlane = planeIntersection(localPosition, vertices[0], 0);
+    auto projectionPlane = planeIntersection(localPosition, vertices[0].toVec3(), 0);
     projectionPlaneSize.x = std::abs(projectionPlane.x * 2);
     auto screenRatio = (float)screenSize.y / screenSize.x;
     projectionPlaneSize.y = projectionPlaneSize.x * screenRatio;
@@ -52,7 +54,7 @@ void Camera::setProjection(Projection proj) {
     }
 }
 
-std::vector<sf::Vector3f> Camera::projectionTransform(const std::vector<sf::Vector3f> &obj) const {
+std::vector<Vertex> Camera::projectionTransform(const std::vector<Vertex> &obj) const {
     return Object::transformed(obj, projectionTransformMatrix);
 }
 
@@ -82,23 +84,7 @@ std::vector<sf::Vector3f> Camera::screenToMap(const std::vector<sf::Vector2i> &p
     return result;
 }
 
-std::vector<sf::Vector3f> Camera::movedBy(const sf::Vector3f &v) const {
-    return std::vector<sf::Vector3f>();
-}
-
-std::vector<sf::Vector3f> Camera::rotatedAround(Line *line, float cosa, float sina) const {
-    return std::vector<sf::Vector3f>();
-}
-
-std::vector<sf::Vector3f> Camera::scaledAround(const sf::Vector3f &p, float kx, float ky, float kz) const {
-    return std::vector<sf::Vector3f>();
-}
-
-std::vector<sf::Vector3f> Camera::transformed(const Matrix<4> &m) const {
-    return std::vector<sf::Vector3f>();
-}
-
-std::vector<sf::Vector2f> Camera::project(const std::vector<sf::Vector3f> &vertices) const {
+std::vector<sf::Vector2f> Camera::project(const std::vector<Vertex> &vertices) const {
     auto projected = Object::transformed(vertices, projectionMatrix);
     std::vector<sf::Vector2f> result;
     result.reserve(projected.size());
@@ -109,18 +95,10 @@ std::vector<sf::Vector2f> Camera::project(const std::vector<sf::Vector3f> &verti
     return result;
 }
 
-std::vector<sf::Vector3f> Camera::rotatedAroundX(float angle) {
-    return std::vector<sf::Vector3f>();
-}
-
-std::vector<sf::Vector3f> Camera::rotatedAroundY(float angle) {
-    return std::vector<sf::Vector3f>();
-}
-
-void Camera::clip(const std::vector<sf::Vector3f> &transformedVertices, Object *obj, Object& result) const {
+void Camera::clip(const std::vector<Vertex> &transformedVertices, Object *obj, Object& result) const {
     std::vector<std::pair<int, int>> edges;
     edges.reserve(obj->edges().size());
-    std::vector<sf::Vector3f> vertices = transformedVertices;
+    std::vector<Vertex> vertices = transformedVertices;
     auto clippingPlane = 0.f;
     for(const auto& edge: obj->edges()) {
         auto first = vertices[edge.first];
@@ -134,7 +112,7 @@ void Camera::clip(const std::vector<sf::Vector3f> &transformedVertices, Object *
             continue;
         }
 
-        auto x = planeIntersection(first, second, clippingPlane);
+        auto x = planeIntersection(first.toVec3(), second.toVec3(), clippingPlane);
 
         auto newEdge = edge;
         if(first.z < clippingPlane) {
@@ -168,7 +146,7 @@ void Camera::renderPolygon(const IndexPolygon &polygon, Object *obj) const {
         return;
     }
 
-    std::vector<sf::Vector3f> vertices;
+    std::vector<Vertex> vertices;
     for(auto idx: polygon.indices()) {
         vertices.push_back(obj->vertices()[idx]);
     }
@@ -211,8 +189,8 @@ void Camera::renderPolygon(const IndexPolygon &polygon, Object *obj) const {
     }
 }
 
-std::vector<sf::Vector3f> Camera::clipPolygon(const std::vector<sf::Vector3f> &vertices) const {
-    std::vector<sf::Vector3f> result;
+std::vector<Vertex> Camera::clipPolygon(const std::vector<Vertex> &vertices) const {
+    std::vector<Vertex> result;
     auto clippingPlane = 0.f;
     for(int i = 0; i < vertices.size(); ++i) {
         auto first = vertices[i];
@@ -226,13 +204,17 @@ std::vector<sf::Vector3f> Camera::clipPolygon(const std::vector<sf::Vector3f> &v
             continue;
         }
 
-        auto x = planeIntersection(first, second, clippingPlane);
+        auto x = planeIntersection(first.toVec3(), second.toVec3(), clippingPlane);
 
         if(first.z < clippingPlane) {
-            result.push_back(x);
+            Vertex n(x);
+            n.setColor(first.color());
+            result.push_back(n);
         } else {
             result.push_back(first);
-            result.push_back(x);
+            Vertex n(x);
+            n.setColor(second.color());
+            result.push_back(n);
         }
     }
 
@@ -245,7 +227,7 @@ void Camera::drawPolygon(const std::vector<sf::Vector2i> &vertices) const {
     }
 }
 
-void Camera::rasterize(const std::vector<sf::Vector3f> &vertices, const IndexPolygon& polygon) const {
+void Camera::rasterize(const std::vector<Vertex> &vertices, const IndexPolygon& polygon) const {
     auto v = vertices;
     if (v[0].y > v[1].y) {
         std::swap(v[0], v[1]);
@@ -263,28 +245,35 @@ void Camera::rasterize(const std::vector<sf::Vector3f> &vertices, const IndexPol
             v[2].z
     };
 
+    sf::Color colors[3] {
+        v[0].color(),
+        v[1].color(),
+        v[2].color()
+    };
+
     auto screenSpace = mapToScreen(project(v));
     int height = screenSpace[2].y - screenSpace[0].y;
     if(height < 1e-5) {
         return;
     }
 
-    for(int i = 0; i < 2; ++i) {
-        int segmentHeight = screenSpace[1 + i].y - screenSpace[i].y;
-        if(segmentHeight < 1e-5) {
-            continue;
-        }
+    /*auto rasterizeHalf = [&](int i) {
+        int segmentHeight = screenSpace[1 + i].y - screenSpace[i].y + 1;
+        //if(segmentHeight < 1e-5) {
+        //    return;
+        //}
 
-        for(int y = screenSpace[i].y; y <= screenSpace[1 + i].y; ++y) {
-            if(y < 0 || y >= screenSize.y) {
-                continue;
-            }
-
+        auto start = std::clamp(screenSpace[i].y, 0, (int)screenSize.y - 1);
+        auto end = std::clamp(screenSpace[1 + i].y, 0, (int)screenSize.y - 1);
+        for(int y = start; y <= end; ++y) {
             float alpha = (float) (y - screenSpace[0].y) / height;
             float beta = (float) (y - screenSpace[i].y) / segmentHeight;
 
             float zinvA = zinv[0] + (zinv[2] - zinv[0]) * alpha;
             float zinvB = zinv[i] + (zinv[1 + i] - zinv[i]) * beta;
+
+            sf::Color colorA (colors[0].r + (colors[2].r - colors[0].r) * alpha, colors[0].g + (colors[2].g - colors[0].g) * alpha, colors[0].b + (colors[2].b - colors[0].b) * alpha);
+            sf::Color colorB (colors[i].r + (colors[1 + i].r - colors[i].r) * beta, colors[i].g + (colors[1 + i].g - colors[i].g) * beta, colors[i].b + (colors[1 + i].b - colors[i].b) * beta);
 
             int A = screenSpace[0].x + (screenSpace[2].x - screenSpace[0].x) * alpha;
             int B = screenSpace[i].x + (screenSpace[1 + i].x - screenSpace[i].x) * beta;
@@ -292,23 +281,74 @@ void Camera::rasterize(const std::vector<sf::Vector3f> &vertices, const IndexPol
             if (A > B) {
                 std::swap(A, B);
                 std::swap(zinvA, zinvB);
+                std::swap(colorA, colorB);
             }
 
-            for (int x = A; x <= B; ++x) {
-                if(x < 0 || x >= screenSize.x) {
-                    continue;
-                }
-
+            auto startX = std::clamp(A, 0, (int)screenSize.x - 1);
+            auto endX = std::clamp(B, 0, (int)screenSize.x - 1);
+            for (int x = startX; x <= endX; ++x) {
                 float gamma = (float) (x - A) / (B - A);
                 float z = zinvA + (zinvB - zinvA) * gamma;
+                sf::Color color (colorA.r + (colorB.r - colorA.r) * gamma, colorA.g + (colorB.g - colorA.g) * gamma, colorA.b + (colorB.b - colorA.b) * gamma);
+
                 auto bufferIdx = y * screenSize.x + x;
                 if(zbuffer[bufferIdx] > z) {
                     zbuffer[bufferIdx] = z;
-                    pixbuf->at(x, y) = polygon.color();
+                    pixbuf->at(x, y) = color;
+                }
+            }
+        }
+    };*/
+
+    for(int i = 0; i < 2; ++i) {
+        int segmentHeight = screenSpace[1 + i].y - screenSpace[i].y + 1;
+        //if(segmentHeight < 1e-5) {
+        //    continue;
+        //}
+
+        auto start = std::clamp(screenSpace[i].y, 0, (int)screenSize.y - 1);
+        auto end = std::clamp(screenSpace[1 + i].y, 0, (int)screenSize.y - 1);
+        for(int y = start; y <= end; ++y) {
+            float alpha = (float) (y - screenSpace[0].y) / height;
+            float beta = (float) (y - screenSpace[i].y) / segmentHeight;
+
+            float zinvA = zinv[0] + (zinv[2] - zinv[0]) * alpha;
+            float zinvB = zinv[i] + (zinv[1 + i] - zinv[i]) * beta;
+
+            sf::Color colorA (colors[0].r + (colors[2].r - colors[0].r) * alpha, colors[0].g + (colors[2].g - colors[0].g) * alpha, colors[0].b + (colors[2].b - colors[0].b) * alpha);
+            sf::Color colorB (colors[i].r + (colors[1 + i].r - colors[i].r) * beta, colors[i].g + (colors[1 + i].g - colors[i].g) * beta, colors[i].b + (colors[1 + i].b - colors[i].b) * beta);
+
+            int A = screenSpace[0].x + (screenSpace[2].x - screenSpace[0].x) * alpha;
+            int B = screenSpace[i].x + (screenSpace[1 + i].x - screenSpace[i].x) * beta;
+
+            if (A > B) {
+                std::swap(A, B);
+                std::swap(zinvA, zinvB);
+                std::swap(colorA, colorB);
+            }
+
+            auto startX = std::clamp(A, 0, (int)screenSize.x - 1);
+            auto endX = std::clamp(B, 0, (int)screenSize.x - 1);
+            for (int x = startX; x <= endX; ++x) {
+                float gamma = (float) (x - A) / (B - A);
+                float z = zinvA + (zinvB - zinvA) * gamma;
+                sf::Color color (colorA.r + (colorB.r - colorA.r) * gamma, colorA.g + (colorB.g - colorA.g) * gamma, colorA.b + (colorB.b - colorA.b) * gamma);
+
+                auto bufferIdx = y * screenSize.x + x;
+                if(zbuffer[bufferIdx] > z) {
+                    zbuffer[bufferIdx] = z;
+                    pixbuf->at(x, y) = color;
                 }
             }
         }
     }
+
+    //std::thread upper(rasterizeHalf, 0);
+    //std::thread lower(rasterizeHalf, 1);
+    //rasterizeHalf(0);
+
+    //upper.join();
+    //lower.join();
 }
 
 sf::Vector3f Camera::viewDirection() const {

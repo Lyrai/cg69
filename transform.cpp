@@ -31,18 +31,6 @@ void Transform::moveBy(const sf::Vector3f &v) {
     worldToObject = m * worldToObject;
 }
 
-
-std::vector<sf::Vector3f> Transform::transformed(const Matrix<3> &m, const sf::Vector3f &v) const {
-    Matrix<4> m4({
-                         m(0, 0), m(0, 1), m(0, 2), 0,
-                         m(1, 0), m(1, 1), m(1, 2), 0,
-                         m(2, 0), m(2, 1), m(2, 2), 0,
-                         v.x, v.y, v.z, 1
-                 });
-
-    return transformed(m4);
-}
-
 void Transform::scaleAround(const sf::Vector3f &p, float kx, float ky, float kz) {
     sf::Vector4f tmp(position.x, position.y, position.z, 1);
     sf::Vector3f v(kx, ky, kz);

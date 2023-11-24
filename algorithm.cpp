@@ -33,18 +33,18 @@ void draw_line(Pixbuf& pixbuf, sf::Vector2i begin, sf::Vector2i end, const sf::C
 Object constructRotationFigure(const std::vector<sf::Vector3f> &points,Camera& cam,int steps,Axis axis)
 {
     float count = 360.f / steps;
-    std::vector<sf::Vector3f> result;
+    std::vector<Vertex> result;
     auto new_points = points;
     result.reserve(points.size() * steps);
     switch (axis) {
         case Axis::X:
         {
-            new_points = Object::rotatedAroundZ(points,90);
+            new_points = Object::rotatedAroundZ(points, 90);
             break;
         }
         case Axis::Z:
         {
-            new_points = Object::rotatedAroundX(points,90);
+            new_points = Object::rotatedAroundX(points, 90);
             break;
         }
     }
