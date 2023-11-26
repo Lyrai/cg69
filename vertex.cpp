@@ -65,7 +65,7 @@ void Vertex::calculateNormal(const std::vector<int> &containingPolygons, Object*
         sum += obj->polygons()[polygon].normal();
     }
 
-    _normal = { sum.x / containingPolygons.size(), sum.y / containingPolygons.size(), sum.z / containingPolygons.size() };
+    _normal = normalize({ sum.x / containingPolygons.size(), sum.y / containingPolygons.size(), sum.z / containingPolygons.size() });
 }
 
 Vertex::Vertex()

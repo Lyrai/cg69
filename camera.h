@@ -4,6 +4,7 @@
 #include "object.h"
 #include "indexpolygon.h"
 #include "pixbuf.h"
+#include "lightsource.h"
 
 enum class Projection {
     Parallel,
@@ -12,7 +13,7 @@ enum class Projection {
 
 class Camera: public Transform {
 public:
-    explicit Camera(const sf::Vector3f& position, std::vector<Object*>* objects, const sf::Vector2u& screenSize);
+    explicit Camera(const sf::Vector3f& position, std::vector<Object*>* objects, std::vector<LightSource*>* lightSources, const sf::Vector2u& screenSize);
     void setProjection(Projection proj);
     void setPixbuf(Pixbuf* buf) { pixbuf = buf; }
 
@@ -33,8 +34,8 @@ private:
     std::vector<Vertex> clipPolygon(const std::vector<Vertex> &vertices) const;
     void draw(const std::vector<sf::Vector2i>& vertices, Object* obj) const;
     void drawPolygon(const std::vector<sf::Vector2i>& vertices) const;
-    void renderPolygon(const IndexPolygon& polygon, Object* obj) const;
-    void rasterize(const std::vector<Vertex>& vertices, const IndexPolygon& polygon) const;
+    void renderPolygon(const IndexPolygon& polygon, Object* obj, const std::vector<LightSource>& lightSources) const;
+    void rasterize(std::vector<Vertex>& vertices, const IndexPolygon& polygon, const std::vector<LightSource>& lightSources, std::vector<sf::Vector3f>& normals) const;
 
 private:
     Projection projection;
@@ -48,6 +49,7 @@ private:
     mutable sf::Texture texture;
     float viewAngle;
     bool zTest;
+    std::vector<LightSource*>* lightSources;
 
     static constexpr float projectionMatrix[16] {
             1, 0, 0, 0,

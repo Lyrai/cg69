@@ -28,6 +28,7 @@ int main() {
 
     Pixbuf pixbuf(sf::Vector2u(window_size.x, window_size.y));
     std::vector<Object *> objects;
+    std::vector<LightSource*> lightSources;
     auto icosahedron = parseFigure("figures/icosahedron_poly.json");
     icosahedron.moveBy({1, 1, 7});
     auto roomPlanes = constructRoomPlanes();
@@ -40,6 +41,10 @@ int main() {
     //Polygons polygons {std::vector<int> {0, 1, 2, 3}};
     //Object cube = Object({0, 0, 0}, {Vertex(0, 0, 0, sf::Color::Green), Vertex(1, 0, 0, sf::Color::White), Vertex(1, 1, 0, sf::Color::Blue), Vertex(0, 1, 0, sf::Color::Red)}, polygons);
     objects.push_back(&cube);
+    LightSource light({0, -2, 0});
+    lightSources.push_back(&light);
+    LightSource light1({0, 2, 0});
+    lightSources.push_back(&light1);
     Object gizmos({0, 0, 0}, {{0, 0, 0},
                               {1, 0, 0},
                               {0, 1, 0},
@@ -48,7 +53,7 @@ int main() {
                                                  {0, 3}}));
     //objects.push_back(&gizmos);
     std::vector<sf::Vector2i> pointsFig;
-    Camera cam({0, 0, -3}, &objects, sf::Vector2u(window_size.x, window_size.y));
+    Camera cam({0, 0, -3}, &objects, &lightSources, sf::Vector2u(window_size.x, window_size.y));
     cam.setPixbuf(&pixbuf);
     cam.setProjection(Projection::Perspective);
     //texture.update(pixbuf.raw());

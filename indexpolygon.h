@@ -12,6 +12,7 @@ public:
     const std::vector<int>& indices() const { return _indices; }
     const sf::Vector3f& normal() const { return _normal; }
     const sf::Vector3f& center() const { return _center; }
+    const sf::Vector3f& center(const Object* object);
     void calculateNormal(const Object* object);
     void calculateNormal(const Object* object, const sf::Vector3f& directionToPolygon);
     const sf::Color& color() const { return _color; }

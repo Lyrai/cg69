@@ -36,6 +36,7 @@ public:
 
     const std::vector<std::pair<int, int>>& edges() const { return _edges; }
     const std::vector<Vertex>& vertices() const { return _vertices; }
+    std::vector<Vertex>& vertices() { return _vertices; }
     const Polygons& polygons() const { return _polygons; }
 
     Object& operator=(Object&& other);

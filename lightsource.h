@@ -4,7 +4,10 @@
 #include "transform.h"
 
 class LightSource: public Transform {
+public:
+    LightSource(const sf::Vector3f& position);
 
+    LightSource transformed(const Matrix<4>& m) const;
 };
 
 

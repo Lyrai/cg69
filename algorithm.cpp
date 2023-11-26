@@ -138,16 +138,19 @@ sf::Vector3f planeIntersection(const sf::Vector3f &begin, const sf::Vector3f &en
 }
 
 
-std::vector<IndexPolygon> triangulate(const IndexPolygon &polygon) {
+std::vector<IndexPolygon> triangulate(IndexPolygon &polygon, Object* obj) {
     std::vector<IndexPolygon> result;
 
-    if(polygon.indices().size() == 3) {
+    /*if(polygon.indices().size() == 3) {
         return { polygon };
-    }
+    }*/
+
+    int idx = obj->vertices().size();
+    obj->vertices().push_back(polygon.center(obj));
 
     auto& vertices = polygon.indices();
-    for(int i = 2; i < vertices.size(); ++i) {
-        IndexPolygon triangle({ vertices[0], vertices[i - 1], vertices[i] }, polygon.color());
+    for(int i = 0; i < vertices.size(); ++i) {
+        IndexPolygon triangle({ idx, vertices[i], vertices[(i + 1) % vertices.size()] }, polygon.color());
         result.push_back(triangle);
     }
 
