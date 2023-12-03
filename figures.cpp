@@ -35,7 +35,7 @@ namespace ns {
     using json = nlohmann::json;
     struct raw_data {
         std::vector<std::vector<std::string>> _vertices;
-        std::vector<std::vector<std::string>> _polygons;
+        std::vector<std::vector<std::pair<std::string, std::vector<std::string>>>> _polygons;
     };
 
     json to_json(const Object& obj) {
@@ -45,9 +45,9 @@ namespace ns {
         }
 
         for (const auto &polygon: obj.polygons()) {
-            std::vector<std::string> p;
+            std::vector<std::pair<std::string, std::vector<std::string>>> p;
             for (const auto idx: polygon.indices()) {
-                p.push_back(std::to_string(idx));
+                p.push_back({std::to_string(idx.index()), {std::to_string(idx.coords().x), std::to_string(idx.coords().y)}});
             }
 
             rd._polygons.emplace_back(std::move(p));
@@ -59,7 +59,19 @@ namespace ns {
 
     void from_json(const json &j, raw_data &rd) {
         j.at("vertices").get_to(rd._vertices);
-        j.at("polygons").get_to(rd._polygons);
+        for (const auto &item: j.at("polygons")) {
+            auto str = to_string(item);
+            std::vector<std::pair<std::string, std::vector<std::string>>> poly;
+            for (const auto &vertex: item) {
+                std::vector<std::string> coords;
+                vertex.at("coords").get_to(coords);
+                std::string idx;
+                vertex.at("idx").get_to(idx);
+                poly.emplace_back(idx, coords);
+            }
+
+            rd._polygons.emplace_back(std::move(poly));
+        }
     }
 }
 
@@ -81,12 +93,13 @@ std::vector<std::pair<int, int>> parseEdges(const std::vector<std::pair<std::str
     return rval;
 }
 
-Polygons parsePolygons(const std::vector<std::vector<std::string>> &raw_polygons) {
+Polygons parsePolygons(const std::vector<std::vector<std::pair<std::string, std::vector<std::string>>>> &raw_polygons) {
     auto rval = Polygons();
     for (const auto &poly_raw: raw_polygons) {
-        std::vector<int> polygon {};
+        std::vector<IndexVertex> polygon {};
         for (const auto &poly_val: poly_raw) {
-            polygon.emplace_back(std::stoi(poly_val));
+            sf::Vector2f vec { std::stof(poly_val.second[0]), std::stof(poly_val.second[1]) };
+            polygon.emplace_back(std::stoi(poly_val.first), vec);
         }
         rval.emplace_back(polygon);
     }
@@ -444,7 +457,7 @@ std::vector<Object> constructRoomPlanes() {
     std::vector<Object> result;
     result.reserve(6);
 
-    Polygons planePolygons {std::vector<int> {0, 1, 2, 3}};
+    Polygons planePolygons {std::vector<IndexVertex> {0, 1, 2, 3}};
     Object bottomPlane({0, 0, 0}, {{-10, 10, -10}, {10, 10, -10}, {10, 10, 50}, {-10, 10, 50}}, planePolygons , {0, -1, 0});
     result.push_back(bottomPlane);
 

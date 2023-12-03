@@ -36,6 +36,7 @@ private:
     void drawPolygon(const std::vector<sf::Vector2i>& vertices) const;
     void renderPolygon(const IndexPolygon& polygon, Object* obj, const std::vector<LightSource>& lightSources) const;
     void rasterize(std::vector<Vertex>& vertices, const IndexPolygon& polygon, const std::vector<LightSource>& lightSources, std::vector<sf::Vector3f>& normals) const;
+    void renderLightSource(const LightSource& source) const;
 
 private:
     Projection projection;

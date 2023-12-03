@@ -30,6 +30,7 @@ public:
     static std::vector<sf::Vector3f> rotatedAroundZ(const std::vector<sf::Vector3f>& vertices, float angle);
     static std::vector<Vertex> movedBy(const std::vector<Vertex>& vertices, sf::Vector3f delta);
 
+
     static void transform(std::vector<Vertex>& vertices, const Matrix<4> &m);
 
     sf::Vector3f center() const;
@@ -40,6 +41,8 @@ public:
     const Polygons& polygons() const { return _polygons; }
 
     Object& operator=(Object&& other);
+
+    void setTexture(const sf::Image& texture);
 
 private:
     std::vector<Vertex> _vertices;

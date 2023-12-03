@@ -459,7 +459,7 @@ void setupGui(tgui::Gui& gui, Object& cube, Camera& cam, Mode& mode) {
         rotateArea6->setVisible(false);
     });
     tetrahedronButton->onClick([&cube](){
-        cube = createTetrahedron();
+        cube = parseFigure("figures/tetrahedron_poly.json");
     });
     octahedronButton->onClick([&cube](){
         cube = createOctahedron();

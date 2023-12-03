@@ -23,14 +23,17 @@ int main() {
     tgui::Gui gui(window);
     Mode mode;
     Axis axis;
-
+    sf::Texture texture_1;
+    sf::Texture texture_2;
+    texture_1.loadFromFile("images.png");
+    texture_2.loadFromFile("rolik.png");
     texture.create(window_size.x, window_size.y);
 
     Pixbuf pixbuf(sf::Vector2u(window_size.x, window_size.y));
     std::vector<Object *> objects;
     std::vector<LightSource*> lightSources;
-    auto icosahedron = parseFigure("figures/icosahedron_poly.json");
-    icosahedron.moveBy({1, 1, 7});
+    //auto icosahedron = parseFigure("figures/icosahedron_poly.json");
+    //icosahedron.moveBy({1, 1, 7});
     auto roomPlanes = constructRoomPlanes();
     for (auto & roomPlane : roomPlanes) {
         objects.push_back(&roomPlane);
@@ -38,6 +41,8 @@ int main() {
     //objects.push_back(&icosahedron);
 
     Object cube = parseFigure("figures/cube_poly.json");
+    sf::Image tex1Image = texture_2.copyToImage();
+    cube.setTexture(tex1Image);
     //Polygons polygons {std::vector<int> {0, 1, 2, 3}};
     //Object cube = Object({0, 0, 0}, {Vertex(0, 0, 0, sf::Color::Green), Vertex(1, 0, 0, sf::Color::White), Vertex(1, 1, 0, sf::Color::Blue), Vertex(0, 1, 0, sf::Color::Red)}, polygons);
     objects.push_back(&cube);
@@ -119,7 +124,7 @@ int main() {
         Polygons polygons;
         for (int i = 0; i < steps - 1; ++i) {
             for (int j = 0; j < steps - 1; ++j) {
-                polygons.emplace_back(std::vector<int>{steps * j + i, steps * j + i + 1, steps * (j + 1) + i + 1,
+                polygons.emplace_back(std::vector<IndexVertex> {steps * j + i, steps * j + i + 1, steps * (j + 1) + i + 1,
                                                        steps * (j + 1) + i});
             }
         }

@@ -109,7 +109,7 @@ Object::Object(const sf::Vector3f &position, const std::vector<Vertex> &vertices
         for (auto &triangle: triangles) {
             triangle.calculateNormal(this);
             for(auto idx: triangle.indices()) {
-                containingPolygons[idx].push_back(_polygons.size());
+                containingPolygons[idx.index()].push_back(_polygons.size());
             }
             _polygons.push_back(triangle);
         }
@@ -128,12 +128,12 @@ Object::Object(const sf::Vector3f &position, const std::vector<Vertex> &vertices
     containingPolygons.resize(_vertices.size() + polygons.size());
 
     for(auto& polygon: polygons) {
-        //polygon.setColor({(sf::Uint8)(rand() % 256), (sf::Uint8)(rand() % 256), (sf::Uint8)(rand() % 256)});
+        polygon.setColor({(sf::Uint8)(rand() % 256), (sf::Uint8)(rand() % 256), (sf::Uint8)(rand() % 256)});
         auto triangles = triangulate(polygon, this);
         for (auto &triangle: triangles) {
             triangle.calculateNormal(this, polygonFaceDirection);
             for(auto idx: triangle.indices()) {
-                containingPolygons[idx].push_back(_polygons.size());
+                containingPolygons[idx.index()].push_back(_polygons.size());
             }
             _polygons.push_back(triangle);
         }
@@ -257,4 +257,10 @@ std::vector<sf::Vector3f> Object::transformed(const std::vector<sf::Vector3f> &v
     }
 
     return result;
+}
+
+void Object::setTexture(const sf::Image& texture) {
+    for(auto& _polygon : _polygons) {
+        _polygon.setTexture(texture);
+    }
 }
